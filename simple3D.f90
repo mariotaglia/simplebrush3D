@@ -1,21 +1,10 @@
 use system
 use MPI
-use ellipsoid
 use kinsol
 use const
-use montecarlo
-use ematrix
-use old
 implicit none
 integer counter, counterr
-integer MCpoints
-integer saveevery 
-real*8 maxmove
-real*8 maxrot
-integer moves,rots
-real*8 rv(3)
 real*8 temp
-real*8 theta
 real*8, external :: rands
 logical flag
 
@@ -45,16 +34,14 @@ if(rank.eq.0)print*, 'Creador OK'
 if(infile.eq.0) then
    call solve
    call Free_Energy_Calc(counter)
-   call savedata(counter/saveevery)
+   call savedata(counter)
 else
    call retrivefromdisk(counter)
    counterr = counter
    if(rank.eq.0)print*, 'Load input from file'
-   if(rank.eq.0)print*, 'Free energy', free_energy
    infile = 2
    call solve
    call Free_Energy_Calc(counter)
-   if(rank.eq.0)print*, 'Free energy after solving', free_energy
 endif
 
 call endall
@@ -84,7 +71,6 @@ end subroutine
 subroutine initconst
 use const
 use molecules
-use ellipsoid
 implicit none
 pi = acos(-1.0)
 seed = 15615
@@ -109,7 +95,6 @@ use molecules
 use const
 use bulk
 use MPI
-use ellipsoid
 use chainsdat
 use inputtemp
 implicit none
@@ -173,7 +158,6 @@ use molecules
 use const
 use bulk
 use MPI
-use ellipsoid
 use chainsdat
 use inputtemp
 implicit none
@@ -257,7 +241,6 @@ use const
 use molecules
 use chainsdat
 use kai
-use ematrix
 use fields_fkfun
 use MPI
 use kinsol
@@ -283,7 +266,7 @@ if(rank.eq.0) then ! solo el jefe escribe a disco....
 !!!!!!!!!!!!!!!!!!! Guarda archivos !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Polimero
 
-  temp(:,:,:) = avpol(:,:,:)*(1.0 - volprot(:,:,:))
+  temp(:,:,:) = avpol(:,:,:)
 
   title = 'avpol'
   call savetodisk(temp, title, cccc)
@@ -350,7 +333,6 @@ if(rank.eq.0) then
 open (unit=8, file='out.out', form='unformatted')
 write(8)counter
 write(8)seed
-write(8)free_energy
 write(8)xflag
 close(8)
 endif
@@ -359,7 +341,6 @@ end subroutine
 
 subroutine retrivefromdisk(counter) ! saves state to disk
 use kinsol
-use ematrix
 use results
 use const
 implicit none
@@ -368,7 +349,6 @@ integer counter
 open (unit=8, file='in.in', form='unformatted')
 read(8)counter
 read(8)seed
-read(8)free_energy
 read(8)xflag
 close(8)
 end subroutine

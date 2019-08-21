@@ -9,7 +9,6 @@ use results
 use kinsol
 use bulk
 use MPI
-use ematrix
 implicit none
 external fcn
 integer i, ix, iy, iz

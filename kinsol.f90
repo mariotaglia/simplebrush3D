@@ -8,7 +8,7 @@ use mkinsol
 implicit none
 
 integer ier
-integer*8 neq, i
+integer neq, i
 double precision udata(*), uscale(*), fdata(*), fscale(*)
 double precision vv(*), ftem(*)
 
@@ -34,7 +34,7 @@ use mkinsol
 implicit none
 
 integer ier
-integer*8 neq, i
+integer neq, i
 double precision udata(*), uscale(*), fdata(*), fscale(*)
 double precision vtemp1(*), vtemp2(*)
 

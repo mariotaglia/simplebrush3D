@@ -24,6 +24,7 @@ real*8 F_Mix_neg, F_Mix_Hplus
 real*8 Free_energy2, sumpi, sumrho, sumel, sumdiel, sum, mupol
 real*8 F_Mix_OHmin, F_Conf, F_Eq, F_vdW, F_eps, F_electro
 real*8 pro0(cuantas, cpp)
+real*8 Free_Energy
  
 ! MPI
 integer stat(MPI_STATUS_SIZE) 
