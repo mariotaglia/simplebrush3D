@@ -39,7 +39,7 @@ do ix = -limit, limit
 enddo
 
 MCsteps = 10
-if(rank.eq.0)print*, 'kais: CORREGIR MCSTEPS!!!!'
+if(rank.eq.0)print*, 'kais: CORREGIR MCSTEPS'
 
 lseg=0.35
 l = lseg 

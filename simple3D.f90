@@ -8,7 +8,7 @@ real*8 temp
 real*8, external :: rands
 logical flag
 
-counter = 0
+counter = 1
 counterr = 1
 
 call readinput

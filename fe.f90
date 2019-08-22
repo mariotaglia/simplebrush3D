@@ -311,6 +311,10 @@ endif
 
       Free_Energy = Free_Energy + F_electro
 
+      if (verbose.ge.1) then
+      print*, 'Free_Energy_Calc: Free energy(1) = ', Free_energy
+      endif
+
 
       F_eps = 0.0 
 
@@ -366,7 +370,7 @@ endif
          Free_Energy2 = Free_Energy2 + sum - F_vdW
 
       if (verbose.ge.1) then
-      print*, 'Free_Energy_Calc: Free energy(2) = ', Free_energy2, sumdiel
+      print*, 'Free_Energy_Calc: Free energy(2) = ', Free_energy2
       endif
 
 ! Guarda energia libre
