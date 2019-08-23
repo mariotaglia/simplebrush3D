@@ -27,7 +27,7 @@ do jj = 1, cpp
             do while (pxtemp.lt.1.0d-20)
               pxtemp = pxtemp + dimx
             enddo     
-            px(il, j, jj) = int(pxtemp) + 1
+            px(il, j, jj) = int(pxtemp) + 1 !!! 
 
             pytemp = (y + posicion(ii, 2))/delta ! en el nuevo sistema
             do while (pytemp.gt.dimy)
@@ -40,6 +40,58 @@ do jj = 1, cpp
             pz(il,j, jj)=int((in1(j,1))/delta)+1
      enddo
 enddo
+
+!do jj = 1, cpp
+!  ii = rank*cpp+jj
+!    do j=1,long
+!       x = in1(j ,2)
+!       y = in1(j, 3)
+!       pxtempA = (x + posicion(ii, 1))/delta     ! en el nuevo sistema
+ !           do while (pxtempA.gt.dimx)
+ !            pxtempA = pxtempA - dimx
+ !           enddo
+ !           do while (pxtempA.lt.1.0d-20)
+  !            pxtempA = pxtempA + dimx
+  !          enddo     
+  !          pxA(il, j, jj) = int(pxtempA) + 1 !!! 
+
+ !           pytempA = (y + posicion(ii, 2))/delta ! en el nuevo sistema
+ !           do while (pytempA.gt.dimy)
+ !             pytempA = pytempA - dimy
+ !           enddo
+ !           do while (pytempA.lt.1.0d-20)
+ !             pytempA = pytempA + dimy
+ !           enddo
+ !           pyA(il, j, jj) = int(pytempA) + 1
+ !           pzA(il,j, jj)=int((in1(j,1))/delta)+1
+!     enddo
+!enddo
+!do jj = 1, cpp
+!  ii = rank*cpp+jj
+!    do j=1,long
+!       x = in1(j ,2)
+!       y = in1(j, 3)
+!       pxtempB = (x + posicion(ii, 1))/delta     ! en el nuevo sistema
+!            do while (pxtempB.gt.dimx)
+!             pxtempB = pxtempB - dimx
+!            enddo
+!            do while (pxtempB.lt.1.0d-20)
+!              pxtempB = pxtempB + dimx
+!            enddo     
+!            pxB(il, j, jj) = int(pxtempB) + 1 !!! 
+
+!            pytempB = (y + posicion(ii, 2))/delta ! en el nuevo sistema
+!            do while (pytempB.gt.dimy)
+!              pytempB = pytempB - dimy
+!            enddo
+!            do while (pytempB.lt.1.0d-20)
+!              pytempB = pytempB + dimy
+!            enddo
+!            pyB(il, j, jj) = int(pytempB) + 1
+!            pzB(il,j, jj)=int((in1(j,1))/delta)+1
+!     enddo
+!enddo
+
 return
 end
       

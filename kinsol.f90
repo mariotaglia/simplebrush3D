@@ -39,13 +39,19 @@ double precision udata(*), uscale(*), fdata(*), fscale(*)
 double precision vtemp1(*), vtemp2(*)
 
 common /psize/ neq
-
+!!!G: chequear
 do i = 1, neq/2
+!do i = 1, neq/3
    pp(i) = 0.1 / (1.0+exp(-udata(i)))
 enddo
 do i = neq/2+1, neq
+!do i = neq/3+1, 2*neq/3
    pp(i) = 1.0
 enddo
+!do i =  2*neq/3+1, neq 
+!   pp(i) = 0.1 / (1.0+exp(-udata(i)))
+!enddo
+!!G: chequear
    ier = 0
 return
 end
@@ -102,6 +108,7 @@ integer ierr
 ! INICIA KINSOL
 
 neq = 2*dimx*dimy*dimz
+!neq = 3*dimx*dimy*dimz !			!!!!G
 msbpre  = 10 ! maximum number of iterations without prec. setup (?)
 fnormtol = 1.0d-6 ! Function-norm stopping tolerance
 scsteptol = 1.0d-6 ! Function-norm stopping tolerance
@@ -130,12 +137,20 @@ call fkinsetrin('FNORM_TOL', fnormtol, ier)
 call fkinsetrin('SSTEP_TOL', scsteptol, ier)
 call fkinsetiin('MAX_NITER', max_niter, ier)
 
-do i = 1, neq  !constraint vector
+do i = 1, neq  !constraint vector 
+!do i = 1, neq/3 		!!GGG 
+!  constr(i) = 2.0
    constr(i) = 0.0
 enddo
 do i = 1, neq/2  !constraint vector
+!!do i = neq/3, 2*neq/3
+!  constr(i) = 0.0
    constr(i) = 2.0
 enddo
+
+!do i = 2*neq/3, neq !constraint vector
+!  constr(i) = 1.0
+!enddo
 
 call fkinsetvin('CONSTR_VEC', constr, ier) ! constraint vector
 ! CALL FKINSPTFQMR (MAXL, IER)

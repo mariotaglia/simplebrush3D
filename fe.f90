@@ -210,11 +210,105 @@ endif
        enddo
        enddo
 
-         enddo ! ii
+       enddo ! ii
 
        endif ! rank
 
       Free_Energy = Free_Energy + F_Conf
+!!G		No toco el original	!!G: F_Conf
+!!!REVISAR QUE ES CADA COSA
+!! Acá supongo que solo tengo que duplicar 
+!!POL-A
+!if (rank.eq.0) then ! Igual tiene que serlo, ver arriba
+!
+!       do jj = 1, cpp
+!       iii = rank*cpp+jj
+!       q_tosendA(iii) = qA(iii) 
+!       enddo
+!
+!        call MPI_REDUCE(q_tosendA, qA0, ncha, &
+!        MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err)
+!
+!       do jj = 1, cpp 
+!       do i = 1, cuantas
+!       iii = jj
+!       
+!         F_Conf = F_Conf + (proA(i, jj)/qA0(iii)) &
+!      *dlog((proA(i, jj))/qA0(iii))
+!
+!       enddo
+!       enddo 
+!
+!        do ii = 2, size ! loop sobre los procesadores restantes
+!
+ !       source = ii-1
+!
+ !       call MPI_RECV(proA0, cuantas*ncha, &
+ !       MPI_DOUBLE_PRECISION, source, tag, MPI_COMM_WORLD,stat, err)
+!
+!
+ !      do jj = 1, cpp
+ !      do i = 1, cuantas
+!
+ !      iii = (ii-1)*cpp+jj
+!
+ !        F_Conf = F_Conf + (proA0(i, jj)/qA0(iii))*dlog((proA0(i, jj))/qA0(iii))
+!
+ !      enddo
+  !     enddo
+!
+ !      enddo ! ii
+
+  !     endif ! rank
+
+!      Free_Energy = Free_Energy + F_Conf
+!!POL-B
+!if (rank.eq.0) then ! Igual tiene que serlo, ver arriba
+!
+ !      do jj = 1, cpp
+ !      iii = rank*cpp+jj
+ !      q_tosendB(iii) = qB(iii) 
+ !      enddo
+!
+ !       call MPI_REDUCE(q_tosendB, qB0, ncha, &
+ !       MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err)
+!
+ !      do jj = 1, cpp 
+ !      do i = 1, cuantas
+ !      iii = jj
+ !      
+ !        F_Conf = F_Conf + (proB(i, jj)/qB0(iii)) &
+ !     *dlog((proB(i, jj))/qB0(iii))
+!
+ !      enddo
+ !      enddo 
+!
+ !        do ii = 2, size ! loop sobre los procesadores restantes
+!
+ !       source = ii-1
+!
+ !       call MPI_RECV(proB0, cuantas*ncha, &
+  !      MPI_DOUBLE_PRECISION, source, tag, MPI_COMM_WORLD,stat, err)
+!
+
+ !      do jj = 1, cpp
+  !     do i = 1, cuantas
+!
+ !      iii = (ii-1)*cpp+jj
+!
+ !        F_Conf = F_Conf + (proB0(i, jj)/qB0(iii))*dlog((proB0(i, jj))/qB0(iii))
+
+  !     enddo
+   !    enddo
+
+    !   enddo ! ii
+
+    !   endif ! rank
+
+!      Free_Energy = Free_Energy + F_Conf
+
+
+!!G			!!!!!!!!!!!!!!!!!!!! !!G:F_conf
 
 ! 7. Chemical Equilibrium
       F_Eq = 0.0 
@@ -242,6 +336,66 @@ endif
       F_eq = F_eq *delta**3/vsol
 
       Free_Energy = Free_Energy + F_Eq
+
+
+!!G			Comento todo para no tocar el original !!G :F_Eq
+!      F_Eq = 0.0 
+            
+
+ !     do ix  = 1, dimx
+ !     do iy  = 1, dimy
+ !     do iz  = 1, dimz
+!!!APORTE POL-A
+ !		if (1.0d-10 < (1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))) then  !! Es posible que este if no haga falta 
+ !			F_Eq = F_Eq + (1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))*dlog(1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))*avpolA(ix,iy,iz)/vpol 
+ !		 endif
+ !		F_Eq = F_Eq + (fdisANC(ix,iy,iz))*dlog(fdisANC(ix,iy,iz))*avpolA(ix,iy,iz)/vpol
+ !		F_Eq = F_Eq + (fdisANa(ix,iy,iz))*dlog(fdisANa(ix,iy,iz))*avpolA(ix,iy,iz)/vpol
+ !    F_Eq = F_Eq + (fdisANC(ix,iy,iz))*dlog(K0A)*avpolA(ix,iy,iz)/vpol
+ !		F_Eq = F_Eq + (fdisANC(ix,iy,iz))*(-dlog(expmuHplus))*avpolA(ix,iy,iz)/vpol
+ !    F_Eq = F_Eq + (fdisANa(ix,iy,iz))*(dlog(K0ANa))*avpolA(ix,iy,iz)/vpol
+ !    F_Eq = F_Eq + (fdisANa(ix,iy,iz))*(-dlog(expmupos))*avpolA(ix,iy,iz)/vpol
+
+ !		F_Eq = F_Eq + (fdisAas(ix,iy,iz))*(-dlog(K0Eo))*avpolA(ix,iy,iz)/vpol
+
+ !	if (1.0d-10 < fdisAas(ix,iy,iz)) then 
+ !	 F_Eq = F_Eq + (fdisAas(ix,iy,iz))*dlog(fdisAas(ix,iy,iz))*avpolA(ix,iy,iz)/vpol
+ !		if (1.0d-10 < avpolA(ix,iy,iz))then 
+ ! 			F_Eq = F_Eq + (-fdisAas(ix,iy,iz))*(dlog(avpolA(ix,iy,iz)*fdisAas(ix,iy,iz))-1.0)*avpolA(ix,iy,iz)/vpol ! usando que Vpol =Vab
+ !		endif
+ !	endif
+
+	!   enddo
+   !   enddo
+   !   enddo
+!! APORTE POL-B
+ !     do ix  = 1, dimx
+ !     do iy  = 1, dimy
+ !     do iz  = 1, dimz
+
+ !		if (1.0d-10 < (1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))) then
+ !    	F_Eq = F_Eq + (1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))*dlog(1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))*avpolB(ix,iy,iz)/vpol
+ !		endif
+
+ !	  F_Eq = F_Eq + (fdisBNC(ix,iy,iz))*dlog(fdisBNC(ix,iy,iz))*avpolB(ix,iy,iz)/vpol
+ !   F_Eq = F_Eq + (fdisBCl(ix,iy,iz))*dlog(fdisBCl(ix,iy,iz))*avpolB(ix,iy,iz)/vpol
+
+ !   F_Eq = F_Eq + (fdisBNC(ix,iy,iz))*dlog(K0B)*avpolB(ix,iy,iz)/vpol
+ !   F_Eq = F_Eq + (fdisBNC(ix,iy,iz))*(-dlog(expmuOHmin))*avpolB(ix,iy,iz)/vpol
+ !   F_Eq = F_Eq + (fdisBCl(ix,iy,iz))*(dlog(K0BCl))*avpolB(ix,iy,iz)/vpol
+ !   F_Eq = F_Eq + (fdisBCl(ix,iy,iz))*(-dlog(expmuneg))*avpolB(ix,iy,iz)/vpol
+
+ !  if ((1.0d-10 < fdisBas(ix,iy,iz))) then 
+ !  F_Eq = F_Eq +( (fdisBas(ix,iy,iz))*dlog(fdisBas(ix,iy,iz)) )*avpolB(ix,iy,iz)/vpol
+ !	endif
+	!   enddo
+   !   enddo
+   !   enddo
+ !     F_eq = F_eq *delta**3/vsol
+
+  !    Free_Energy = Free_Energy + F_Eq
+!!G !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!G :F_Eq
+
 ! 8.vdW ! Ojo, los kai son negativos => atraccion
 
        F_vdW = 0.0
@@ -327,6 +481,9 @@ endif
         sumel=0.0
         sumdiel = 0.0
 
+!!G:  Término asociacion !!!!!!!!!!!G:sumas
+		!sumas=0.0
+
         do ix=1,dimx
         do iy=1,dimy
         do iz=1,dimz
@@ -346,6 +503,9 @@ endif
           gradpsi2 = (psi(ix+1,iy,iz)-psi(ix,iy,iz))**2+(psi(ix,iy+1,iz)-psi(ix,iy,iz))**2+(psi(ix,iy,iz+1)-psi(ix,iy,iz))**2
           sumdiel = sumdiel + 0.5/constq*xtotal(ix,iy,iz)*gradpsi2*Depsfcn(ix,iy,iz)
 
+		!!!G:TÉRMINO  DE PAIR AB !!!!!!!G:SUMAS.
+			!sumas=sumas +avpolA(ix,iy,iz)*fdisAas(ix,iy,iz)/vpol
+
          enddo
          enddo
          enddo
@@ -359,6 +519,9 @@ endif
          sumel = (delta**3/vsol)*sumel
          sumdiel = (delta**3/vsol)*sumdiel
 
+!!G: 
+   !		!sumas= (delta**3/vsol)*sumas		
+   !      sum = sumpi + sumrho + sumel + sumdiel+sumas
 
          sum = sumpi + sumrho + sumel + sumdiel
 
@@ -367,11 +530,22 @@ endif
          Free_Energy2 = Free_Energy2-dlog(q0(ii)/shift) 
          enddo
 
+!         do ii = 1, ncha
+!         Free_Energy2 = Free_Energy2-dlog(qA0(ii)/shiftA) 
+!         enddo
+!         do ii = 1, ncha
+!         Free_Energy2 = Free_Energy2-dlog(qB0(ii)/shiftB) 
+!         enddo
+
          Free_Energy2 = Free_Energy2 + sum - F_vdW
 
       if (verbose.ge.1) then
       print*, 'Free_Energy_Calc: Free energy(2) = ', Free_energy2
       endif
+
+!!diffener= Free_energy- Free_energy2 !!!!!!!g:
+
+!!print*, 'Free energy:', Free_energy, Free_energy2,diffener !!!!G
 
 ! Guarda energia libre
 
@@ -381,9 +555,48 @@ endif
         mupol = mupol - dlog(q0(ii)/shift)
         enddo
         mupol = mupol/ncha
+!
 
+!!!!!!!!!!!!gg!!!!!!!!!!
+!!!!G: mupola  y mu pol B
 
+!        mupolA = 0.0
+ !       do ii = 1, ncha
+   !     mupolA = mupolA - dlog(qA0(ii)/shiftA)
+!        enddo
+!        mupolA = mupolA/ncha        
+!		
+!       mupolB = 0.0
+       ! do ii = 1, ncha
+!        mupolB = mupolB - dlog(qB0(ii)/shiftB)
+!        enddo
+!        mupolB = mupolB/ncha
+!
+!!G: h sin el factor dos
 
+! EL h  está sin el factor 2 multiplicando 
+	
+!h capa 
+CHEQUEEEAARRRR!!!!!!!
+!			hcapa=0.0
+!			normhcapa=0.0
+
+!      do ix  = 1, dimx!
+!      do iy  = 1, dimy
+!      do iz  = 1, dimz
+
+!
+!				normhcapa=normhcapa+(avpolA(ix,iy,iz)+avpolB(ix,iy,iz))*delta**3/vpol
+!				hcapa=hcapa+(avpolA(ix,iy,iz)+avpolB(ix,iy,iz))*(ix+iy+iz)*delta*delta**3/vpol
+CHEQUEEEAARRRR!!!!!!!
+!			enddo
+!			enddo
+!			enddo
+!			if(1.0d-10 <normhcapa)then
+!				hcapa=2.0*hcapa/normhcapa
+!			!endif
+
+!!!!!!!!!!!!!gg!!!!!!!!!!
           if(rank.eq.0) then
 
  
@@ -403,6 +616,9 @@ endif
          write(312,*)looped, Free_energy2
 
          write(313,*)looped, mupol
+!!       write(313,*)looped, mupolA
+!!       write(313,*)looped, mupolB
+!!			write(316,*)cc, ccc, hcapa
 
          endif
  

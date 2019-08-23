@@ -16,12 +16,14 @@ integer i, ix, iy, iz
 !-----  varables de la resolucion -----------
 
 real*8 x1(2*dimx*dimy*dimz),xg1(2*dimx*dimy*dimz)
-       
+!       real*8 x1(3*dimx*dimy*dimz),xg1(3*dimx*dimy*dimz)
 integer n
 
 ! Volumen fraction
 real*8 xh(dimx, dimy, dimz)
 real*8 psi(dimx, dimy, dimz) ! potencial
+
+!real*8 xna(dimx, dimy, dimz) ! potencial
 
 ! MPI
 integer tag, source
@@ -38,6 +40,7 @@ n = dimx*dimy*dimz
 
 if(infile.eq.2) then
   do i = 1, 2*n  
+! do i = 1, 3*n  
       xg1(i) = xflag(i)     
       x1(i) = xflag(i)
   enddo
@@ -52,6 +55,11 @@ if(infile.eq.0) then
     xg1(i)=0.0d0
     x1(i)=0.0d0
   enddo
+
+!  do i=2*n+1, n*3
+!    xg1(i)=0.0001
+!    x1(i)=0.0001
+!  enddo
 endif
 
 !--------------------------------------------------------------
@@ -62,6 +70,7 @@ endif
 if(rank.eq.0) then ! solo el jefe llama al solver
    iter = 0
    print*, 'solve: Enter solver ', 2*n, ' eqs'
+!   print*, 'solve: Enter solver ', 3*n, ' eqs'
    call call_kinsol(x1, xg1, ier)
    flagsolver = 0
    CALL MPI_BCAST(flagsolver, 1, MPI_INTEGER, 0, MPI_COMM_WORLD,err)
@@ -108,6 +117,7 @@ do ix=1,dimx
       do iz=1,dimz
        xh(ix,iy,iz)=x1(ix+dimx*(iy-1)+dimx*dimy*(iz-1))
        psi(ix,iy,iz)=x1(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+n)
+!      xna(ix,iy,iz)=x1(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+n+n)
       enddo
    enddo  
 enddo
@@ -125,6 +135,7 @@ endif
 
 ! No exploto, guardo xflag
 do i = 1, 2*n
+!do i = 1, 3*n
   xflag(i) = x1(i) ! xflag sirve como input para la proxima iteracion
 enddo
 infile = 2 ! no vuelve a leer infile

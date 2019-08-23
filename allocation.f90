@@ -29,6 +29,27 @@ ALLOCATE (fdis(dimx, dimy, dimz))
 ALLOCATE (epsfcn(0:dimx+1, 0:dimy+1, 0:dimz+1))
 ALLOCATE (Depsfcn(0:dimx+1, 0:dimy+1, 0:dimz+1))
 
+!!G:!!!!!!!!
+!ALLOCATE (avpolA(dimx, dimy, dimz))
+!ALLOCATE (avpolB(dimx, dimy, dimz))
+!allocate(fdisANC(dimx, dimy, dimz)) !	fraction not charge pol-A
+!allocate(fdisBNC(dimx, dimy, dimz)) !	fraction not charge pol-B
+!allocate(fdisAas(dimx, dimy, dimz)) !	fraction associate pol-A
+!allocate(fdisBas(dimx, dimy, dimz)) 
+!allocate(fdisANa(dimx, dimy, dimz)) !	fraction not charge pol-A
+!allocate(fdisBCl(dimx, dimy, dimz)) !	fraction not charge pol-B
+!allocate(xna(dimx, dimy, dimz))
+!allocate(xnb(dimx, dimy, dimz))
+!allocate(eta(dimx, dimy, dimz))
+!allocate(m(dimx, dimy, dimz))
+!allocate(KK0check(dimx, dimy, dimz))
+!allocate(KK0checkp(dimx, dimy, dimz))
+!allocate(KKaAcheckplus(dimx, dimy, dimz))
+!allocate(KKaAna(dimx, dimy, dimz))
+!allocate(KKaBCl(dimx, dimy, dimz))
+!allocate(KKaBcheckmin(dimx, dimy, dimz))
+!!G:!!!!!!!
+
 ! mkinsol
 ALLOCATE (pp(2*dimx*dimy*dimz))
 

@@ -24,7 +24,8 @@ use system
 real*8 vsol
 real*8 vpol
 real*8 vsalt
-real*8 zpos,zneg, zpol
+real*8 zpos,zneg, zpol!, zpolA, zpolB  !GGG
+!real*8 K0A, K0B ,K0ANa,K0BCl, K0Eo!K0
 real*8 st
 endmodule
 
@@ -37,6 +38,8 @@ real*8, allocatable :: q(:)
 !pro(cuantas, cpp)
 real*8, allocatable :: pro(:,:)
 real*8, allocatable :: xh(:, :, :)
+!real*8, allocatable :: proA(:,:)
+!real*8, allocatable :: proB(:,:)
 real*8 shift
 endmodule
 
@@ -44,6 +47,13 @@ module conformations
 integer, allocatable :: px(:,:,:)
 integer, allocatable :: py(:,:,:)
 integer, allocatable :: pz(:,:,:)
+
+!integer, allocatable :: pxA(:,:,:)
+!integer, allocatable :: pyA(:,:,:)
+!integer, allocatable :: pzA(:,:,:)
+!integer, allocatable :: pxB(:,:,:)
+!integer, allocatable :: pyB(:,:,:)
+!integer, allocatable :: pzB(:,:,:)
 endmodule
 
 module MPI
@@ -86,6 +96,8 @@ endmodule
 module results
 use system
 real*8, allocatable :: avpol(:,:,:)
+!real*8, allocatable :: avpolA(:,:,:)
+!real*8, allocatable :: avpolB(:,:,:)
 real*8, allocatable :: epsfcn(:,:,:)
 real*8, allocatable :: Depsfcn(:,:,:)
 real*8, allocatable :: xpos(:,:,:) ! pos ion
@@ -94,6 +106,24 @@ real*8, allocatable :: qtot(:,:,:) ! Carga total
 real*8, allocatable :: xHplus(:,:,:) ! H+
 real*8, allocatable :: xOHmin(:,:,:) ! OH-
 real*8, allocatable :: fdis(:,:,:)
+!real*8 qA
+!real*8 qB
+!real*8, allocatable :: xna(:,:,:)
+!real*8, allocatable :: xnb(:,:,:)
+!real*8, allocatable :: eta(:,:,:)
+!real*8, allocatable :: M(:,:,:)
+!real*8, allocatable :: KK0check(:,:,:)
+!real*8, allocatable :: KK0checkp(:,:,:)
+!real*8, allocatable :: KKaAna(:,:,:)
+!real*8, allocatable :: KKaBCl(:,:,:)
+!real*8, allocatable :: KKaAcheckplus(:,:,:)
+!real*8, allocatable :: kkaBcheckmin(:,:,:)
+!real*8, allocatable :: fdisANC(:,:,:)
+!real*8, allocatable :: fdisBNC(:,:,:)
+!real*8, allocatable :: fdisAas(:,:,:)
+!real*8, allocatable :: fdisBas(:,:,:)
+!real*8, allocatable :: fdisANa(:,:,:)
+!real*8, allocatable :: fdisBCl(:,:,:)
 endmodule
 
 module bulk
@@ -109,4 +139,11 @@ real*8 pOHbulk
 real*8 pKa, Ka
 real*8 csalt
 real*8 cHplus, cOHmin
+!real*8 pKaA
+!real*8 pkaB
+!real*8 pKaANa
+!real*8 pkaBCl
+!real*8 sigmaA
+!real*8 sigmaB
+!real*8 pkEo
 end module
