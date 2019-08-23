@@ -311,89 +311,91 @@ endif
 !!G			!!!!!!!!!!!!!!!!!!!! !!G:F_conf
 
 ! 7. Chemical Equilibrium
+!comento original 
+     ! F_Eq = 0.0 
+            
+
+     ! do ix  = 1, dimx
+     ! do iy  = 1, dimy
+     ! do iz  = 1, dimz
+      
+     ! F_Eq = F_Eq + fdis(ix, iy, iz)*dlog(fdis(ix, iy, iz)) &
+     ! *avpol(ix,iy,iz)/vpol
+
+  !    F_Eq = F_Eq + (1.0-fdis(ix,iy,iz)) &
+   !   *dlog(1.0-fdis(ix, iy,iz))*avpol(ix, iy,iz)/vpol
+
+!      F_Eq = F_Eq + (1.0-fdis(ix, iy,iz))*dlog(K0)*avpol(ix, iy,iz)/vpol
+
+!      F_Eq = F_Eq + (1.0-fdis(ix, iy,iz)) &!
+!      *(-dlog(expmuHplus))*avpol(ix, iy, iz)/vpol
+
+ !     enddo
+ !     enddo
+ !     enddo
+
+!      F_eq = F_eq *delta**3/vsol
+
+ !     Free_Energy = Free_Energy + F_Eq
+
+
+!!G			Comento todo para no tocar el original !!G :F_Eq
       F_Eq = 0.0 
             
 
       do ix  = 1, dimx
       do iy  = 1, dimy
       do iz  = 1, dimz
-      
-      F_Eq = F_Eq + fdis(ix, iy, iz)*dlog(fdis(ix, iy, iz)) &
-      *avpol(ix,iy,iz)/vpol
+!!!APORTE POL-A
+ 		if (1.0d-10 < (1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))) then  !! Es posible que este if no haga falta 
+ 			F_Eq = F_Eq + (1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))*dlog(1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))*avpol(ix,iy,iz,1)/vpol 
+		 endif
+ 		F_Eq = F_Eq + (fdisANC(ix,iy,iz))*dlog(fdisANC(ix,iy,iz))*avpol(ix,iy,iz,1)/vpol
+ 		F_Eq = F_Eq + (fdisANa(ix,iy,iz))*dlog(fdisANa(ix,iy,iz))*avpol(ix,iy,iz,1)/vpol
+     F_Eq = F_Eq + (fdisANC(ix,iy,iz))*dlog(K0A)*avpol(ix,iy,iz,1)/vpol
+ 		F_Eq = F_Eq + (fdisANC(ix,iy,iz))*(-dlog(expmuHplus))*avpol(ix,iy,iz,1)/vpol
+    F_Eq = F_Eq + (fdisANa(ix,iy,iz))*(dlog(K0ANa))*avpol(ix,iy,iz,1)/vpol
+     F_Eq = F_Eq + (fdisANa(ix,iy,iz))*(-dlog(expmupos))*avpol(ix,iy,iz,1)/vpol
 
-      F_Eq = F_Eq + (1.0-fdis(ix,iy,iz)) &
-      *dlog(1.0-fdis(ix, iy,iz))*avpol(ix, iy,iz)/vpol
+ 		F_Eq = F_Eq + (fdisAas(ix,iy,iz))*(-dlog(K0Eo))*avpol(ix,iy,iz,1)/vpol
 
-      F_Eq = F_Eq + (1.0-fdis(ix, iy,iz))*dlog(K0)*avpol(ix, iy,iz)/vpol
+ 	if (1.0d-10 < fdisAas(ix,iy,iz)) then 
+ 	 F_Eq = F_Eq + (fdisAas(ix,iy,iz))*dlog(fdisAas(ix,iy,iz))*avpol(ix,iy,iz,1)/vpol
+ 		if (1.0d-10 < avpol(ix,iy,iz,1))then 
+  			F_Eq = F_Eq + (-fdisAas(ix,iy,iz))*(dlog(avpol(ix,iy,iz,1)*fdisAas(ix,iy,iz))-1.0)*avpol(ix,iy,iz,1)/vpol ! usando que Vpol =Vab
+ 		endif
+ 	endif
 
-      F_Eq = F_Eq + (1.0-fdis(ix, iy,iz)) &
-      *(-dlog(expmuHplus))*avpol(ix, iy, iz)/vpol
-
+	   enddo
       enddo
       enddo
-      enddo
+!! APORTE POL-B
+      do ix  = 1, dimx
+      do iy  = 1, dimy
+      do iz  = 1, dimz
 
-      F_eq = F_eq *delta**3/vsol
+ 		if (1.0d-10 < (1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))) then
+     	F_Eq = F_Eq + (1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))*dlog(1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))*avpol(ix,iy,iz,2)/vpol
+ 		endif
+
+ 	  F_Eq = F_Eq + (fdisBNC(ix,iy,iz))*dlog(fdisBNC(ix,iy,iz))*avpol(ix,iy,iz,2)/vpol
+    F_Eq = F_Eq + (fdisBCl(ix,iy,iz))*dlog(fdisBCl(ix,iy,iz))*avpol(ix,iy,iz,2)/vpol
+
+    F_Eq = F_Eq + (fdisBNC(ix,iy,iz))*dlog(K0B)*avpol(ix,iy,iz,2)/vpol
+   F_Eq = F_Eq + (fdisBNC(ix,iy,iz))*(-dlog(expmuOHmin))*avpol(ix,iy,iz,2)/vpol
+    F_Eq = F_Eq + (fdisBCl(ix,iy,iz))*(dlog(K0BCl))*avpol(ix,iy,iz,2)/vpol
+    F_Eq = F_Eq + (fdisBCl(ix,iy,iz))*(-dlog(expmuneg))*avpol(ix,iy,iz,2)/vpol
+
+			if ((1.0d-10 < fdisBas(ix,iy,iz))) then 
+			F_Eq = F_Eq +( (fdisBas(ix,iy,iz))*dlog(fdisBas(ix,iy,iz)) )*avpol(ix,iy,iz,2)/vpol
+		 	endif
+	   enddo
+      enddo
+      enddo
+     F_eq = F_eq *delta**3/vsol
 
       Free_Energy = Free_Energy + F_Eq
 
-
-!!G			Comento todo para no tocar el original !!G :F_Eq
-!      F_Eq = 0.0 
-            
-
- !     do ix  = 1, dimx
- !     do iy  = 1, dimy
- !     do iz  = 1, dimz
-!!!APORTE POL-A
- !		if (1.0d-10 < (1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))) then  !! Es posible que este if no haga falta 
- !			F_Eq = F_Eq + (1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))*dlog(1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))*avpolA(ix,iy,iz)/vpol 
- !		 endif
- !		F_Eq = F_Eq + (fdisANC(ix,iy,iz))*dlog(fdisANC(ix,iy,iz))*avpolA(ix,iy,iz)/vpol
- !		F_Eq = F_Eq + (fdisANa(ix,iy,iz))*dlog(fdisANa(ix,iy,iz))*avpolA(ix,iy,iz)/vpol
- !    F_Eq = F_Eq + (fdisANC(ix,iy,iz))*dlog(K0A)*avpolA(ix,iy,iz)/vpol
- !		F_Eq = F_Eq + (fdisANC(ix,iy,iz))*(-dlog(expmuHplus))*avpolA(ix,iy,iz)/vpol
- !    F_Eq = F_Eq + (fdisANa(ix,iy,iz))*(dlog(K0ANa))*avpolA(ix,iy,iz)/vpol
- !    F_Eq = F_Eq + (fdisANa(ix,iy,iz))*(-dlog(expmupos))*avpolA(ix,iy,iz)/vpol
-
- !		F_Eq = F_Eq + (fdisAas(ix,iy,iz))*(-dlog(K0Eo))*avpolA(ix,iy,iz)/vpol
-
- !	if (1.0d-10 < fdisAas(ix,iy,iz)) then 
- !	 F_Eq = F_Eq + (fdisAas(ix,iy,iz))*dlog(fdisAas(ix,iy,iz))*avpolA(ix,iy,iz)/vpol
- !		if (1.0d-10 < avpolA(ix,iy,iz))then 
- ! 			F_Eq = F_Eq + (-fdisAas(ix,iy,iz))*(dlog(avpolA(ix,iy,iz)*fdisAas(ix,iy,iz))-1.0)*avpolA(ix,iy,iz)/vpol ! usando que Vpol =Vab
- !		endif
- !	endif
-
-	!   enddo
-   !   enddo
-   !   enddo
-!! APORTE POL-B
- !     do ix  = 1, dimx
- !     do iy  = 1, dimy
- !     do iz  = 1, dimz
-
- !		if (1.0d-10 < (1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))) then
- !    	F_Eq = F_Eq + (1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))*dlog(1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))*avpolB(ix,iy,iz)/vpol
- !		endif
-
- !	  F_Eq = F_Eq + (fdisBNC(ix,iy,iz))*dlog(fdisBNC(ix,iy,iz))*avpolB(ix,iy,iz)/vpol
- !   F_Eq = F_Eq + (fdisBCl(ix,iy,iz))*dlog(fdisBCl(ix,iy,iz))*avpolB(ix,iy,iz)/vpol
-
- !   F_Eq = F_Eq + (fdisBNC(ix,iy,iz))*dlog(K0B)*avpolB(ix,iy,iz)/vpol
- !   F_Eq = F_Eq + (fdisBNC(ix,iy,iz))*(-dlog(expmuOHmin))*avpolB(ix,iy,iz)/vpol
- !   F_Eq = F_Eq + (fdisBCl(ix,iy,iz))*(dlog(K0BCl))*avpolB(ix,iy,iz)/vpol
- !   F_Eq = F_Eq + (fdisBCl(ix,iy,iz))*(-dlog(expmuneg))*avpolB(ix,iy,iz)/vpol
-
- !  if ((1.0d-10 < fdisBas(ix,iy,iz))) then 
- !  F_Eq = F_Eq +( (fdisBas(ix,iy,iz))*dlog(fdisBas(ix,iy,iz)) )*avpolB(ix,iy,iz)/vpol
- !	endif
-	!   enddo
-   !   enddo
-   !   enddo
- !     F_eq = F_eq *delta**3/vsol
-
-  !    Free_Energy = Free_Energy + F_Eq
 !!G !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!G :F_Eq
 
 ! 8.vdW ! Ojo, los kai son negativos => atraccion
@@ -504,7 +506,7 @@ endif
           sumdiel = sumdiel + 0.5/constq*xtotal(ix,iy,iz)*gradpsi2*Depsfcn(ix,iy,iz)
 
 		!!!G:TÉRMINO  DE PAIR AB !!!!!!!G:SUMAS.
-			!sumas=sumas +avpolA(ix,iy,iz)*fdisAas(ix,iy,iz)/vpol
+			sumas=sumas +avpol(ix,iy,iz,1)*fdisAas(ix,iy,iz)/vpol
 
          enddo
          enddo
@@ -520,8 +522,8 @@ endif
          sumdiel = (delta**3/vsol)*sumdiel
 
 !!G: 
-   !		!sumas= (delta**3/vsol)*sumas		
-   !      sum = sumpi + sumrho + sumel + sumdiel+sumas
+   		sumas= (delta**3/vsol)*sumas		
+         sum = sumpi + sumrho + sumel + sumdiel+sumas
 
          sum = sumpi + sumrho + sumel + sumdiel
 

@@ -19,7 +19,7 @@ real*8 x(*),f(*)
 real*8 protemp
 integer i,j, ix, iy, iz, ii, ax, ay, az
 integer jx, jy, jj
-real*8 xpot(dimx, dimy, dimz)
+real*8 xpot(dimx, dimy, dimz,2)
 ! Charge
 real*8 psitemp
 ! poor solvent 
@@ -28,7 +28,7 @@ real*8 sttemp
 integer tag
 parameter(tag = 0)
 integer err
-real*8 avpol_tosend(dimx,dimy,dimz)
+real*8 avpol_tosend(dimx,dimy,dimz,2)
 real*8 avpol_temp(dimx,dimy,dimz)
 real*8 volprot(dimx,dimy,dimz)
 real*8 q_tosend
@@ -65,7 +65,7 @@ do ix=1,dimx
   do iz=1,dimz
      xh(ix,iy,iz)=x(ix+dimx*(iy-1)+dimx*dimy*(iz-1))
      psi(ix,iy,iz)=x(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot)   
-    ! xna(ix,iy,iz)=x(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot+ntot)   
+     xna(ix,iy,iz)=x(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot+ntot)   
   enddo
  enddo
 enddo
@@ -111,35 +111,35 @@ enddo
 do ix=1,dimx
  do iy=1,dimy
   do iz=1,dimz
-    avpol(ix,iy,iz)=0.0		!!!!G::: NO ME QUEDA CLARO PORQUE ESTÁ ESTO ACA
+!    avpol(ix,iy,iz)=0.0		!!!!G::: NO ME QUEDA CLARO PORQUE ESTÁ ESTO ACA
 									!!G: TAL VEZ NO IMPORTA
     xpos(ix, iy, iz) = expmupos*(xh(ix, iy, iz)**vsalt)*dexp(-psi(ix, iy, iz)*zpos) ! ion plus volume fraction 
     xneg(ix, iy, iz) = expmuneg*(xh(ix, iy, iz)**vsalt)*dexp(-psi(ix, iy, iz)*zneg) ! ion neg volume fraction
     xHplus(ix, iy, iz) = expmuHplus*(xh(ix, iy, iz))*dexp(-psi(ix, iy, iz))           ! H+ volume fraction
     xOHmin(ix, iy,iz) = expmuOHmin*(xh(ix,iy,iz))*dexp(+psi(ix,iy,iz))           ! OH-  volume fraction
-    fdis(ix,iy,iz)=1.0 /(1.0 + xHplus(ix,iy,iz)/(K0*xh(ix,iy,iz)) )
+    !fdis(ix,iy,iz)=1.0 /(1.0 + xHplus(ix,iy,iz)/(K0*xh(ix,iy,iz)) )
 
 !!G::
-!	xnb(ix,iy,iz)=1.0-xna(ix,iy,iz)-xh(ix,iy,iz)-xpos(ix,iy,iz)-xneg(ix,iy,iz)-xHplus(ix,iy,iz)-xOHmin(ix,iy,iz)
-!	fdisAas(iz)=0.0d0 													
-!	fdisBas(iz)=0.0d0			
+	xnb(ix,iy,iz)=1.0-xna(ix,iy,iz)-xh(ix,iy,iz)-xpos(ix,iy,iz)-xneg(ix,iy,iz)-xHplus(ix,iy,iz)-xOHmin(ix,iy,iz)
+	fdisAas(ix,iy,iz)=0.0d0 													
+	fdisBas(ix,iy,iz)=0.0d0			
 !
-!if ((1.0d-6 .lt. xna(ix,iy,iz)).AND.(1.0d-6 .lt. xnb(ix,iy,iz))) THEN
-!	eta(ix,iy,iz)=xna(ix,iy,iz)/xnb(ix,iy,iz)
+if ((1.0d-6 .lt. xna(ix,iy,iz)).AND.(1.0d-6 .lt. xnb(ix,iy,iz))) THEN
+	eta(ix,iy,iz)=xna(ix,iy,iz)/xnb(ix,iy,iz)
 
-!M(ix,iy,iz)=( 1.0+ (xOHmin(ix,iy,iz))/(K0B*xh(ix,iy,iz))+(xneg(ix,iy,iz)/(K0BCl*xh(ix,iy,iz)**vsalt)) )*( 1.0&
-!+ (xHplus(ix,iy,iz))/(K0A*xh(ix,iy,iz)) +(xpos(ix,iy,iz)/(K0ANa*xh(ix,iy,iz)**vsalt)))/(K0Eo*xna(ix,iy,iz)) 							   !!gabi: vpair = vpol!!
-! 	 	fdisAas(ix,iy,iz) = (1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0*eta(ix,iy,iz))-(	-1.0/eta(ix,iy,iz)+(	(1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0*eta(ix,iy,iz))	)**2	)**0.5 !!!!!!!!!!!!!!!!!!!!!!!
- !  	fdisBas(ix,iy,iz) = (1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0)-eta(ix,iy,iz)*(	-1.0/eta(ix,iy,iz)+(	(1.0+eta(iz)+eta(iz)*M(iz))/(2.0*eta(iz))	)**2	)**0.5 !!!!!!!!!!!!!!!!!!!!!!!
+M(ix,iy,iz)=( 1.0+ (xOHmin(ix,iy,iz))/(K0B*xh(ix,iy,iz))+(xneg(ix,iy,iz)/(K0BCl*xh(ix,iy,iz)**vsalt)) )*( 1.0&
++ (xHplus(ix,iy,iz))/(K0A*xh(ix,iy,iz)) +(xpos(ix,iy,iz)/(K0ANa*xh(ix,iy,iz)**vsalt)))/(K0Eo*xna(ix,iy,iz)) 							   !!gabi: vpair = vpol!!
+ 	 	fdisAas(ix,iy,iz) = (1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0*eta(ix,iy,iz))-(	-1.0/eta(ix,iy,iz)+(	(1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0*eta(ix,iy,iz))	)**2	)**0.5 !!!!!!!!!!!!!!!!!!!!!!!
+   	fdisBas(ix,iy,iz) = (1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0)-eta(ix,iy,iz)*(	-1.0/eta(ix,iy,iz)+(	(1.0+eta(iz)+eta(iz)*M(ix,iy,iz))/(2.0*eta(ix,iy,iz))	)**2	)**0.5 !!!!!!!!!!!!!!!!!!!!!!!
 	
-!	endif
+	endif
 
-!	fdisANC(ix,iy,iz) = (1.0-fdisAas(ix,iy,iz) )/(1.0 + (K0A*xh(ix,iy,iz))/(xHplus(ix,iy,iz))&
-!+ (K0A*xpos(ix,iy,iz)* (xh(ix,iy,iz)**(1.0-vsalt)))/(K0ANa*xHplus(ix,iy,iz)) )						   !g
-!   fdisBNC(ix,iy,iz) = (1.0-fdisBas(ix,iy,iz) )/(1.0 + (K0B*xh(ix,iy,iz))/(xOHmin(ix,iy,iz))&
-! + (K0B*xneg(ix,iy,iz)* (xh(ix,iy,iz)**(1.0-vsalt)))/(K0BCl*xOHmin(ix,iy,iz)) )						   !g
-!	fdisANa(ix,iy,iz) = (fdisANC(ix,iy,iz))*(K0A*xpos(ix,iy,iz)* (xh(ix,iy,iz)**(1.0-vsalt)) )/(xHplus(ix,iy,iz)*K0ANa)
-!	fdisBCl(ix,iy,iz) = (fdisBNC(ix,iy,iz))*(K0B*xneg(ix,iy,iz)* (xh(ix,iy,iz)**(1.0-vsalt)) )/(xOHmin(ix,iy,iz)*K0BCl)
+	fdisANC(ix,iy,iz) = (1.0-fdisAas(ix,iy,iz) )/(1.0 + (K0A*xh(ix,iy,iz))/(xHplus(ix,iy,iz))&
++ (K0A*xpos(ix,iy,iz)* (xh(ix,iy,iz)**(1.0-vsalt)))/(K0ANa*xHplus(ix,iy,iz)) )						   !g
+   fdisBNC(ix,iy,iz) = (1.0-fdisBas(ix,iy,iz) )/(1.0 + (K0B*xh(ix,iy,iz))/(xOHmin(ix,iy,iz))&
+ + (K0B*xneg(ix,iy,iz)* (xh(ix,iy,iz)**(1.0-vsalt)))/(K0BCl*xOHmin(ix,iy,iz)) )						   !g
+	fdisANa(ix,iy,iz) = (fdisANC(ix,iy,iz))*(K0A*xpos(ix,iy,iz)* (xh(ix,iy,iz)**(1.0-vsalt)) )/(xHplus(ix,iy,iz)*K0ANa)
+	fdisBCl(ix,iy,iz) = (fdisBNC(ix,iy,iz))*(K0B*xneg(ix,iy,iz)* (xh(ix,iy,iz)**(1.0-vsalt)) )/(xOHmin(ix,iy,iz)*K0BCl)
 
 			!KK0check(ix,iy,iz)=-dlog10( (Na/1.0d24)*fdisBas(ix,iy,iz)/(	(1.0-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz)&
 !-fdisANC(ix,iy,iz))*(1.0-fdisBas(ix,iy,iz)-fdisBNC(ix,iy,iz)-fdisBCl(ix,iy,iz))*xna(ix,iy,iz) )	)/pKeo
@@ -210,17 +210,17 @@ do ix=1,dimx
  do iy=1,dimy
    do iz=1,dimz
 
-     xpot(ix, iy, iz) = xh(ix,iy,iz)**vpol/fdis(ix,iy,iz)*dexp(-psi(ix, iy, iz)*zpol)
-!preguntar  si está bien   fdis con psi     
-!  xpotA(ix, iy, iz) = xh(ix, iy, iz)**vpol*dexp(-psi2(ix, iy, iz)*zpolA)/(1.0-fdisAas(ix, iy, iz)-fdisANC(ix, iy, iz)-fdisANa(ix, iy, iz)) 
-!  xpotB(ix, iy, iz) = xh(ix, iy, iz)**vpol*dexp(-psi2(ix, iy, iz)*zpolB)/(1.0-fdisBas(ix, iy, iz)-fdisBNC(ix, iy, iz)-fdisBCl(ix, iy, iz))
+    ! xpot(ix, iy, iz) = xh(ix,iy,iz)**vpol/fdis(ix,iy,iz)*dexp(-psi(ix, iy, iz)*zpol)
+   
+  xpot(ix, iy, iz,1) = xh(ix, iy, iz)**vpol*dexp(-psi(ix, iy, iz)*zpolA)/(1.0-fdisAas(ix, iy, iz)-fdisANC(ix, iy, iz)-fdisANa(ix, iy, iz)) 
+  xpot(ix, iy, iz,2) = xh(ix, iy, iz)**vpol*dexp(-psi(ix, iy, iz)*zpolB)/(1.0-fdisBas(ix, iy, iz)-fdisBNC(ix, iy, iz)-fdisBCl(ix, iy, iz))
 
      gradpsi2 = (psi(ix+1,iy,iz)-psi(ix,iy,iz))**2+(psi(ix,iy+1,iz)-psi(ix,iy,iz))**2+(psi(ix,iy,iz+1)-psi(ix,iy,iz))**2 
 
-     xpot(ix,iy,iz) = xpot(ix,iy,iz)*exp(Depsfcn(ix,iy,iz)*(gradpsi2)/constq/2.0*vpol)
+    ! xpot(ix,iy,iz) = xpot(ix,iy,iz)*exp(Depsfcn(ix,iy,iz)*(gradpsi2)/constq/2.0*vpol)
 
-!     xpotA(ix,iy,iz) = xpotA(ix,iy,iz)*exp(Depsfcn(ix,iy,iz)*(gradpsi2)/constq/2.0*vpol)
-!     xpotB(ix,iy,iz) = xpotB(ix,iy,iz)*exp(Depsfcn(ix,iy,iz)*(gradpsi2)/constq/2.0*vpol)
+     xpot(ix,iy,iz,1) = xpot(ix,iy,iz,1)*exp(Depsfcn(ix,iy,iz)*(gradpsi2)/constq/2.0*vpol)
+     xpot(ix,iy,iz,2) = xpot(ix,iy,iz,2)*exp(Depsfcn(ix,iy,iz)*(gradpsi2)/constq/2.0*vpol)
 
 
 
@@ -238,86 +238,59 @@ do ix=1,dimx
       enddo
      enddo
 
-     xpot(ix, iy, iz) = xpot(ix, iy, iz)*dexp(protemp)
+   !  xpot(ix, iy, iz) = xpot(ix, iy, iz)*dexp(protemp)
 
-!	    xpotA(ix, iy, iz) = xpotA(ix, iy, iz)*dexp(protemp)
-!    xpotB(ix, iy, iz) = xpotB(ix, iy, iz)*dexp(protemp)
+	    xpot(ix, iy, iz,1) = xpot(ix, iy, iz,1)*dexp(protemp)
+    xpot(ix, iy, iz,2) = xpot(ix, iy, iz,2)*dexp(protemp)
    enddo
   enddo
 enddo
 
+!avpol_tosend = 0.0
+!q = 0
+
+q = 0.0
 avpol_tosend = 0.0
-q = 0
 
-!qA = 0.0
-!avpol_tosendA = 0.0
-!qB = 0.0
-!avpol_tosendB = 0.0
-
-do jj = 1, cpp
-   ii = jj+rank*cpp
+do jj = 1, cpp ! caden por prosc jj num procesad
+   ii = jj+rank*cpp ! ii cant de cadenas
    q_tosend=0.0
    avpol_temp = 0.0
 		
-!   q_tosendA=0.0
-!   avpol_tempA = 0.0
-!   q_tosendB=0.0
-!   avpol_tempB = 0.0
-	
+
  do i=1,cuantas
    pro(i, jj)=shift
-!  proA(i, jj)=shiftA
-!  proB(i, jj)=shiftB
+
    do j=1,long
     ax = px(i, j, jj) ! cada uno para su cadena...
     ay = py(i, j, jj)
     az = pz(i, j, jj)         
-    pro(i, jj) = pro(i, jj) * xpot(ax, ay, az)
-
-!    axA = pxA(i, j, jj) ! cada uno para su cadena...
-!    ayA = pyA(i, j, jj)
-!    azA = pzA(i, j, jj)         
-!    proA(i, jj) = proA(i, jj) * xpotA(axA, ayA, azA)
-!    axB = pxB(i, j, jj) ! cada uno para su cadena...
-!    ayB = pyB(i, j, jj)
-!    azB = pzB(i, j, jj)         
-!    proB(i, jj) = proB(i, jj) * xpotB(axB, ayB, azB)
+    pro(i, jj) = pro(i, jj) * xpot(ax, ay, az,ct(ii))
 
    enddo
    do j=1,long
    avpol_temp(px(i,j, jj),py(i,j, jj),pz(i,j, jj))= &
    avpol_temp(px(i,j, jj),py(i,j, jj),pz(i,j, jj))+pro(i, jj)*vpol*vsol/(delta**3)
 
-!   avpol_tempA(pxA(i,j, jj),pyA(i,j, jj),pzA(i,j, jj))= &
-!   avpol_tempA(pxA(i,j, jj),pyA(i,j, jj),pzA(i,j, jj))+proA(i, jj)*vpol*vsol/(delta**3)
- !  avpol_tempB(pxB(i,j, jj),pyB(i,j, jj),pzB(i,j, jj))= &
- !  avpol_tempB(pxB(i,j, jj),pyB(i,j, jj),pzB(i,j, jj))+proB(i, jj)*vpol*vsol/(delta**3)
+
 
    enddo
 
    q_tosend=q_tosend+pro(i, jj)
-!  q_tosendA=q_tosendA+proA(i, jj)
-!  q_tosendB=q_tosendB+proB(i, jj)
+
  enddo ! i
 ! norma 
  do ix=1,dimx
   do iy=1,dimy
    do iz=1,dimz
-    avpol_tosend(ix,iy,iz)=avpol_tosend(ix, iy, iz) + avpol_temp(ix,iy,iz)/q_tosend
-
- !   avpol_tosendA(ix,iy,iz)=avpol_tosendA(ix, iy, iz) + avpol_tempA(ix,iy,iz)/q_tosendA
- !   avpol_tosendB(ix,iy,iz)=avpol_tosendB(ix, iy, iz) + avpol_tempB(ix,iy,iz)/q_tosendB
+    avpol_tosend(ix,iy,iz,ct(ii))=avpol_tosend(ix, iy, iz,ct(ii)) + avpol_temp(ix,iy,iz)/q_tosend
     enddo
    enddo
  enddo
 q(ii) = q_tosend ! no la envia ahora
 
-!qA(ii) = q_tosendA ! no la envia ahora
-!qB(ii) = q_tosendB ! no la envia ahora
 enddo ! jj
 
-
-!!!!!!!!!!!!!!GGGGGG NO CHEQUEADO!!!!!!!!!
 
 !------------------ MPI ----------------------------------------------
 !1. Todos al jefe
@@ -328,19 +301,18 @@ call MPI_Barrier(MPI_COMM_WORLD, err)
 ! Jefe
 if (rank.eq.0) then
 ! Junta avpol       
-  call MPI_REDUCE(avpol_tosend, avpol, dimx*dimy*dimz, MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err)
+  call MPI_REDUCE(avpol_tosend, avpol, dimx*dimy*dimz*2, MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err)
 endif
 ! Subordinados
 if(rank.ne.0) then
 ! Junta avpol       
-  call MPI_REDUCE(avpol_tosend, avpol, dimx*dimy*dimz, MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err) 
+  call MPI_REDUCE(avpol_tosend, avpol, dimx*dimy*dimz*2, MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err) 
 !!!!!!!!!!! IMPORTANTE, LOS SUBORDINADOS TERMINAN ACA... SINO VER !MPI_allreduce!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
   goto 3333
 endif
 
 !!!!!!!!!!!!!!!!!!!!!!! FIN MPI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-!!!!!!!!!!!!!!GGGGGG NO CHEQUEADO!!!!!!!!!
 !----------------------------------------------------------------------------------------------
 !   Construye Ecuaciones a resolver 
 !----------------------------------------------------------------------------------------------
@@ -351,11 +323,8 @@ do ix=1,dimx
    do iy=1,dimy
         do iz=1,dimz
   
-         qtot(ix, iy, iz) =  (zpos*xpos(ix, iy, iz)+zneg*xneg(ix, iy, iz))/vsalt + avpol(ix, iy, iz)*zpol/vpol*fdis(ix,iy,iz) + &
-         xHplus(ix, iy, iz) - xOHmin(ix, iy, iz)
-
-! qtot(ix, iy, iz) = (zpos*xpos(ix, iy, iz)+zneg*xneg(ix, iy, iz))/vsalt + avpolA(ix, iy, iz)*zpolA/vpol*(1.0-fdisANC(ix, iy, iz)-fdisAas(ix, iy, iz)-fdisANa(ix, iy, iz))&
-!+ avpolB(ix, iy, iz)*zpolB/vpol*(1.0-fdisBNC(ix, iy, iz)-fdisBas(ix, iy, iz)-fdisBCl(ix, iy, iz)) + xHplus(ix, iy, iz)-xOHmin(ix, iy, iz) 
+         qtot(ix, iy, iz) =  (zpos*xpos(ix, iy, iz)+zneg*xneg(ix, iy, iz))/vsalt + avpol(ix, iy, iz,1)*zpolA/vpol*(1.0-fdisANC(ix, iy, iz)-fdisAas(ix, iy, iz)-fdisANa(ix, iy, iz)) + &
++ avpol(ix, iy, iz,2)*zpolB/vpol*(1.0-fdisBNC(ix, iy, iz)-fdisBas(ix, iy, iz)-fdisBCl(ix, iy, iz)) +    xHplus(ix, iy, iz) - xOHmin(ix, iy, iz)
 
         enddo
    enddo
@@ -366,13 +335,9 @@ enddo
 do ix=1,dimx
    do iy=1,dimy
       do iz=1,dimz
-      f(ix+dimx*(iy-1)+dimx*dimy*(iz-1))= avpol(ix,iy,iz) + xh(ix,iy,iz) + &
+      f(ix+dimx*(iy-1)+dimx*dimy*(iz-1))= avpol(ix,iy,iz,1)+avpol(ix,iy,iz,2) + xh(ix,iy,iz) + &
       xneg(ix, iy, iz) + xpos(ix, iy, iz) + xHplus(ix, iy, iz) + &
       xOHmin(ix, iy, iz) -1.000000d0
-
-!      f(ix+dimx*(iy-1)+dimx*dimy*(iz-1))= avpolA(ix,iy,iz) +avpolB(ix,iy,iz) + xh(ix,iy,iz) + &
-  !    xneg(ix, iy, iz) + xpos(ix, iy, iz) + xHplus(ix, iy, iz) + &
-  !    xOHmin(ix, iy, iz) -1.000000d0
 
       enddo
    enddo
@@ -403,18 +368,17 @@ enddo
  
 ! third block of f, ASSOCIATE RELATION
  
-!do ix=1,dimx
-!   do iy=1,dimy
-!       do iz=1,dimz
-!			 f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot+ntot)=xna(ix,iy,iz)-avpolA(ix,iy,iz) !	
- !     enddo
-  ! enddo
-!enddo
+do ix=1,dimx
+   do iy=1,dimy
+       do iz=1,dimz
+			 f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot+ntot)=xna(ix,iy,iz)-avpol(ix,iy,iz,1) !	
+      enddo
+  enddo
+enddo
 
 norma = 0.0
 
-do i = 1, 2*ntot
-!do i = 1, 3*ntot
+do i = 1, 3*ntot
   norma = norma + (f(i))**2
 enddo
 
