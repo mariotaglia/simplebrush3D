@@ -25,7 +25,7 @@ real*8 vsol
 real*8 vpol
 real*8 vsalt
 real*8 zpos,zneg, zpol!, zpolA, zpolB  !GGG
-!real*8 K0A, K0B ,K0ANa,K0BCl, K0Eo!K0
+real*8 K0A, K0B ,K0ANa,K0BCl, K0Eo!K0
 real*8 st
 endmodule
 
@@ -48,12 +48,7 @@ integer, allocatable :: px(:,:,:)
 integer, allocatable :: py(:,:,:)
 integer, allocatable :: pz(:,:,:)
 
-!integer, allocatable :: pxA(:,:,:)
-!integer, allocatable :: pyA(:,:,:)
-!integer, allocatable :: pzA(:,:,:)
-!integer, allocatable :: pxB(:,:,:)
-!integer, allocatable :: pyB(:,:,:)
-!integer, allocatable :: pzB(:,:,:)
+
 endmodule
 
 module MPI

@@ -111,8 +111,7 @@ enddo
 do ix=1,dimx
  do iy=1,dimy
   do iz=1,dimz
-!    avpol(ix,iy,iz)=0.0		!!!!G::: NO ME QUEDA CLARO PORQUE ESTÁ ESTO ACA
-									!!G: TAL VEZ NO IMPORTA
+!    avpol(ix,iy,iz)=0.0	
     xpos(ix, iy, iz) = expmupos*(xh(ix, iy, iz)**vsalt)*dexp(-psi(ix, iy, iz)*zpos) ! ion plus volume fraction 
     xneg(ix, iy, iz) = expmuneg*(xh(ix, iy, iz)**vsalt)*dexp(-psi(ix, iy, iz)*zneg) ! ion neg volume fraction
     xHplus(ix, iy, iz) = expmuHplus*(xh(ix, iy, iz))*dexp(-psi(ix, iy, iz))           ! H+ volume fraction
@@ -252,7 +251,7 @@ enddo
 q = 0.0
 avpol_tosend = 0.0
 
-do jj = 1, cpp ! caden por prosc jj num procesad
+do jj = 1, cpp ! cpp caden por prosc jj num procesad
    ii = jj+rank*cpp ! ii cant de cadenas
    q_tosend=0.0
    avpol_temp = 0.0
@@ -271,8 +270,6 @@ do jj = 1, cpp ! caden por prosc jj num procesad
    do j=1,long
    avpol_temp(px(i,j, jj),py(i,j, jj),pz(i,j, jj))= &
    avpol_temp(px(i,j, jj),py(i,j, jj),pz(i,j, jj))+pro(i, jj)*vpol*vsol/(delta**3)
-
-
 
    enddo
 
