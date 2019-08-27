@@ -45,7 +45,7 @@ volprot = 0.0
 if(rank.eq.0) then ! llama a subordinados y pasa vector x
    flagsolver = 1
    CALL MPI_BCAST(flagsolver, 1, MPI_INTEGER, 0, MPI_COMM_WORLD,err)
-   CALL MPI_BCAST(x, 2*dimx*dimy*dimz , MPI_DOUBLE_PRECISION,0, MPI_COMM_WORLD,err)
+   CALL MPI_BCAST(x, 3*dimx*dimy*dimz , MPI_DOUBLE_PRECISION,0, MPI_COMM_WORLD,err)
 endif
 
 !------------------------------------------------------
@@ -128,8 +128,10 @@ if ((1.0d-6 .lt. xna(ix,iy,iz)).AND.(1.0d-6 .lt. xnb(ix,iy,iz))) THEN
 
 M(ix,iy,iz)=( 1.0+ (xOHmin(ix,iy,iz))/(K0B*xh(ix,iy,iz))+(xneg(ix,iy,iz)/(K0BCl*xh(ix,iy,iz)**vsalt)) )*( 1.0&
 + (xHplus(ix,iy,iz))/(K0A*xh(ix,iy,iz)) +(xpos(ix,iy,iz)/(K0ANa*xh(ix,iy,iz)**vsalt)))/(K0Eo*xna(ix,iy,iz)) 							   !!gabi: vpair = vpol!!
- 	 	fdisAas(ix,iy,iz) = (1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0*eta(ix,iy,iz))-(	-1.0/eta(ix,iy,iz)+(	(1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0*eta(ix,iy,iz))	)**2	)**0.5 !!!!!!!!!!!!!!!!!!!!!!!
-   	fdisBas(ix,iy,iz) = (1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0)-eta(ix,iy,iz)*(	-1.0/eta(ix,iy,iz)+(	(1.0+eta(iz)+eta(iz)*M(ix,iy,iz))/(2.0*eta(ix,iy,iz))	)**2	)**0.5 !!!!!!!!!!!!!!!!!!!!!!!
+ 	 	fdisAas(ix,iy,iz) = (1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0*eta(ix,iy,iz))-(	-1.0/eta(ix,iy,iz)&
++(	(1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0*eta(ix,iy,iz))	)**2	)**0.5 !!!!!!!!!!!!!!!!!!!!!!!
+   	fdisBas(ix,iy,iz) = (1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0)-eta(ix,iy,iz)*(	-1.0/eta(ix,iy,iz)&
++(	(1.0+eta(ix,iy,iz)+eta(ix,iy,iz)*M(ix,iy,iz))/(2.0*eta(ix,iy,iz))	)**2	)**0.5 !!!!!!!!!!!!!!!!!!!!!!!
 	
 	endif
 
@@ -211,8 +213,10 @@ do ix=1,dimx
 
     ! xpot(ix, iy, iz) = xh(ix,iy,iz)**vpol/fdis(ix,iy,iz)*dexp(-psi(ix, iy, iz)*zpol)
    
-  xpot(ix, iy, iz,1) = xh(ix, iy, iz)**vpol*dexp(-psi(ix, iy, iz)*zpolA)/(1.0-fdisAas(ix, iy, iz)-fdisANC(ix, iy, iz)-fdisANa(ix, iy, iz)) 
-  xpot(ix, iy, iz,2) = xh(ix, iy, iz)**vpol*dexp(-psi(ix, iy, iz)*zpolB)/(1.0-fdisBas(ix, iy, iz)-fdisBNC(ix, iy, iz)-fdisBCl(ix, iy, iz))
+  xpot(ix, iy, iz,1) = xh(ix, iy, iz)**vpol*dexp(-psi(ix, iy, iz)*zpolA)/(1.0-fdisAas(ix, iy, iz)&
+-fdisANC(ix, iy, iz)-fdisANa(ix, iy, iz)) 
+  xpot(ix, iy, iz,2) = xh(ix, iy, iz)**vpol*dexp(-psi(ix, iy, iz)*zpolB)/(1.0-fdisBas(ix, iy, iz)&
+-fdisBNC(ix, iy, iz)-fdisBCl(ix, iy, iz))
 
      gradpsi2 = (psi(ix+1,iy,iz)-psi(ix,iy,iz))**2+(psi(ix,iy+1,iz)-psi(ix,iy,iz))**2+(psi(ix,iy,iz+1)-psi(ix,iy,iz))**2 
 
@@ -320,8 +324,10 @@ do ix=1,dimx
    do iy=1,dimy
         do iz=1,dimz
   
-         qtot(ix, iy, iz) =  (zpos*xpos(ix, iy, iz)+zneg*xneg(ix, iy, iz))/vsalt + avpol(ix, iy, iz,1)*zpolA/vpol*(1.0-fdisANC(ix, iy, iz)-fdisAas(ix, iy, iz)-fdisANa(ix, iy, iz)) + &
-+ avpol(ix, iy, iz,2)*zpolB/vpol*(1.0-fdisBNC(ix, iy, iz)-fdisBas(ix, iy, iz)-fdisBCl(ix, iy, iz)) +    xHplus(ix, iy, iz) - xOHmin(ix, iy, iz)
+         qtot(ix, iy, iz) =  (zpos*xpos(ix, iy, iz)+zneg*xneg(ix, iy, iz))/vsalt &
++ avpol(ix, iy, iz,1)*zpolA/vpol*(1.0-fdisANC(ix, iy, iz)-fdisAas(ix, iy, iz)-fdisANa(ix, iy, iz)) + &
+ avpol(ix, iy, iz,2)*zpolB/vpol*(1.0-fdisBNC(ix, iy, iz)-fdisBas(ix, iy, iz)-fdisBCl(ix, iy, iz)) +&
+    xHplus(ix, iy, iz) - xOHmin(ix, iy, iz)
 
         enddo
    enddo

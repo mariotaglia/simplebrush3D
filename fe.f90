@@ -21,7 +21,7 @@ real*8  q_tosend(ncha)
 real*8  q0(ncha)
 real*8 F_Mix_s, F_Mix_pos
 real*8 F_Mix_neg, F_Mix_Hplus
-real*8 Free_energy2, sumpi, sumrho, sumel, sumdiel, sum, mupol
+real*8 Free_energy2, sumpi, sumrho, sumel, sumdiel, sum, mupol,sumas
 real*8 F_Mix_OHmin, F_Conf, F_Eq, F_vdW, F_eps, F_electro
 real*8 pro0(cuantas, cpp)
 real*8 Free_Energy
@@ -215,100 +215,8 @@ endif
        endif ! rank
 
       Free_Energy = Free_Energy + F_Conf
-!!G		No toco el original	!!G: F_Conf
-!!!REVISAR QUE ES CADA COSA
-!! Acá supongo que solo tengo que duplicar 
-!!POL-A
-!if (rank.eq.0) then ! Igual tiene que serlo, ver arriba
-!
-!       do jj = 1, cpp
-!       iii = rank*cpp+jj
-!       q_tosendA(iii) = qA(iii) 
-!       enddo
-!
-!        call MPI_REDUCE(q_tosendA, qA0, ncha, &
-!        MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err)
-!
-!       do jj = 1, cpp 
-!       do i = 1, cuantas
-!       iii = jj
-!       
-!         F_Conf = F_Conf + (proA(i, jj)/qA0(iii)) &
-!      *dlog((proA(i, jj))/qA0(iii))
-!
-!       enddo
-!       enddo 
-!
-!        do ii = 2, size ! loop sobre los procesadores restantes
-!
- !       source = ii-1
-!
- !       call MPI_RECV(proA0, cuantas*ncha, &
- !       MPI_DOUBLE_PRECISION, source, tag, MPI_COMM_WORLD,stat, err)
-!
-!
- !      do jj = 1, cpp
- !      do i = 1, cuantas
-!
- !      iii = (ii-1)*cpp+jj
-!
- !        F_Conf = F_Conf + (proA0(i, jj)/qA0(iii))*dlog((proA0(i, jj))/qA0(iii))
-!
- !      enddo
-  !     enddo
-!
- !      enddo ! ii
-
-  !     endif ! rank
-
-!      Free_Energy = Free_Energy + F_Conf
-!!POL-B
-!if (rank.eq.0) then ! Igual tiene que serlo, ver arriba
-!
- !      do jj = 1, cpp
- !      iii = rank*cpp+jj
- !      q_tosendB(iii) = qB(iii) 
- !      enddo
-!
- !       call MPI_REDUCE(q_tosendB, qB0, ncha, &
- !       MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err)
-!
- !      do jj = 1, cpp 
- !      do i = 1, cuantas
- !      iii = jj
- !      
- !        F_Conf = F_Conf + (proB(i, jj)/qB0(iii)) &
- !     *dlog((proB(i, jj))/qB0(iii))
-!
- !      enddo
- !      enddo 
-!
- !        do ii = 2, size ! loop sobre los procesadores restantes
-!
- !       source = ii-1
-!
- !       call MPI_RECV(proB0, cuantas*ncha, &
-  !      MPI_DOUBLE_PRECISION, source, tag, MPI_COMM_WORLD,stat, err)
-!
-
- !      do jj = 1, cpp
-  !     do i = 1, cuantas
-!
- !      iii = (ii-1)*cpp+jj
-!
- !        F_Conf = F_Conf + (proB0(i, jj)/qB0(iii))*dlog((proB0(i, jj))/qB0(iii))
-
-  !     enddo
-   !    enddo
-
-    !   enddo ! ii
-
-    !   endif ! rank
-
-!      Free_Energy = Free_Energy + F_Conf
 
 
-!!G			!!!!!!!!!!!!!!!!!!!! !!G:F_conf
 
 ! 7. Chemical Equilibrium
 !comento original 
@@ -339,7 +247,6 @@ endif
  !     Free_Energy = Free_Energy + F_Eq
 
 
-!!G			Comento todo para no tocar el original !!G :F_Eq
       F_Eq = 0.0 
             
 
@@ -348,7 +255,8 @@ endif
       do iz  = 1, dimz
 !!!APORTE POL-A
  		if (1.0d-10 < (1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))) then  !! Es posible que este if no haga falta 
- 			F_Eq = F_Eq + (1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))*dlog(1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))*avpol(ix,iy,iz,1)/vpol 
+ 			F_Eq = F_Eq + (1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))&
+*dlog(1.0-fdisANC(ix,iy,iz)-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz))*avpol(ix,iy,iz,1)/vpol 
 		 endif
  		F_Eq = F_Eq + (fdisANC(ix,iy,iz))*dlog(fdisANC(ix,iy,iz))*avpol(ix,iy,iz,1)/vpol
  		F_Eq = F_Eq + (fdisANa(ix,iy,iz))*dlog(fdisANa(ix,iy,iz))*avpol(ix,iy,iz,1)/vpol
@@ -362,7 +270,8 @@ endif
  	if (1.0d-10 < fdisAas(ix,iy,iz)) then 
  	 F_Eq = F_Eq + (fdisAas(ix,iy,iz))*dlog(fdisAas(ix,iy,iz))*avpol(ix,iy,iz,1)/vpol
  		if (1.0d-10 < avpol(ix,iy,iz,1))then 
-  			F_Eq = F_Eq + (-fdisAas(ix,iy,iz))*(dlog(avpol(ix,iy,iz,1)*fdisAas(ix,iy,iz))-1.0)*avpol(ix,iy,iz,1)/vpol ! usando que Vpol =Vab
+  			F_Eq = F_Eq + (-fdisAas(ix,iy,iz))*(dlog(avpol(ix,iy,iz,1)&
+*fdisAas(ix,iy,iz))-1.0)*avpol(ix,iy,iz,1)/vpol ! usando que Vpol =Vab
  		endif
  	endif
 
@@ -375,7 +284,8 @@ endif
       do iz  = 1, dimz
 
  		if (1.0d-10 < (1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))) then
-     	F_Eq = F_Eq + (1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))*dlog(1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))*avpol(ix,iy,iz,2)/vpol
+     	F_Eq = F_Eq + (1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))&
+*dlog(1.0-fdisBNC(ix,iy,iz)-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz))*avpol(ix,iy,iz,2)/vpol
  		endif
 
  	  F_Eq = F_Eq + (fdisBNC(ix,iy,iz))*dlog(fdisBNC(ix,iy,iz))*avpol(ix,iy,iz,2)/vpol
@@ -484,7 +394,7 @@ endif
         sumdiel = 0.0
 
 !!G:  Término asociacion !!!!!!!!!!!G:sumas
-		!sumas=0.0
+	sumas=0.0
 
         do ix=1,dimx
         do iy=1,dimy
@@ -579,8 +489,6 @@ endif
 ! EL h  está sin el factor 2 multiplicando 
 	
 !h capa 
-CHEQUEEEAARRRR!!!!!!!
-!			hcapa=0.0
 !			normhcapa=0.0
 
 !      do ix  = 1, dimx!
@@ -590,7 +498,7 @@ CHEQUEEEAARRRR!!!!!!!
 !
 !				normhcapa=normhcapa+(avpolA(ix,iy,iz)+avpolB(ix,iy,iz))*delta**3/vpol
 !				hcapa=hcapa+(avpolA(ix,iy,iz)+avpolB(ix,iy,iz))*(ix+iy+iz)*delta*delta**3/vpol
-CHEQUEEEAARRRR!!!!!!!
+
 !			enddo
 !			enddo
 !			enddo

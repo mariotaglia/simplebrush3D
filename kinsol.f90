@@ -40,17 +40,17 @@ double precision vtemp1(*), vtemp2(*)
 
 common /psize/ neq
 !!!G: chequear
-do i = 1, neq/2
-!do i = 1, neq/3
+!do i = 1, neq/2
+do i = 1, neq/3
    pp(i) = 0.1 / (1.0+exp(-udata(i)))
 enddo
-do i = neq/2+1, neq
-!do i = neq/3+1, 2*neq/3
+!do i = neq/2+1, neq
+do i = neq/3+1, 2*neq/3
    pp(i) = 1.0
 enddo
-!do i =  2*neq/3+1, neq 
-!   pp(i) = 0.1 / (1.0+exp(-udata(i)))
-!enddo
+do i =  2*neq/3+1, neq 
+   pp(i) = 0.1 / (1.0+exp(-udata(i)))
+enddo
 !!G: chequear
    ier = 0
 return
@@ -66,9 +66,9 @@ use MPI
 
 integer i
 
-real*8 x1_old(2*dimx*dimy*dimz)
-real*8 x1(2*dimx*dimy*dimz)
-real*8 f(2*dimx*dimy*dimz)
+real*8 x1_old(3*dimx*dimy*dimz)
+real*8 x1(3*dimx*dimy*dimz)
+real*8 f(3*dimx*dimy*dimz)
 
 ! MPI
 
@@ -77,11 +77,11 @@ parameter(tag = 0)
 integer err
 
 x1 = 0.0
-do i = 1,2*dimx*dimy*dimz
+do i = 1,3*dimx*dimy*dimz
   x1(i) = x1_old(i)
 enddo
 
-CALL MPI_BCAST(x1, 2*dimx*dimy*dimz , MPI_DOUBLE_PRECISION,0, MPI_COMM_WORLD,err)
+CALL MPI_BCAST(x1, 3*dimx*dimy*dimz , MPI_DOUBLE_PRECISION,0, MPI_COMM_WORLD,err)
 
 call fkfun(x1,f, ier) ! todavia no hay solucion => fkfun 
 end
@@ -90,14 +90,14 @@ subroutine call_kinsol(x1_old, xg1_old, ier)
 use system
 implicit none
 integer i
-real*8 x1(2*dimx*dimy*dimz), xg1(2*dimx*dimy*dimz)
-real*8 x1_old(2*dimx*dimy*dimz), xg1_old(2*dimx*dimy*dimz)
+real*8 x1(3*dimx*dimy*dimz), xg1(3*dimx*dimy*dimz)
+real*8 x1_old(3*dimx*dimy*dimz), xg1_old(3*dimx*dimy*dimz)
 integer*8 iout(15) ! Kinsol additional output information
 real*8 rout(2) ! Kinsol additional out information
 integer*8 msbpre
 real*8 fnormtol, scsteptol
-real*8 scale(2*dimx*dimy*dimz)
-real*8 constr(2*dimx*dimy*dimz)
+real*8 scale(3*dimx*dimy*dimz)
+real*8 constr(3*dimx*dimy*dimz)
 integer*4  globalstrat, maxl, maxlrst
 integer*4 ier ! Kinsol error flag
 integer neq ! Kinsol number of equations
@@ -107,8 +107,7 @@ integer ierr
 
 ! INICIA KINSOL
 
-neq = 2*dimx*dimy*dimz
-!neq = 3*dimx*dimy*dimz !			!!!!G
+neq = 3*dimx*dimy*dimz
 msbpre  = 10 ! maximum number of iterations without prec. setup (?)
 fnormtol = 1.0d-6 ! Function-norm stopping tolerance
 scsteptol = 1.0d-6 ! Function-norm stopping tolerance
@@ -137,20 +136,20 @@ call fkinsetrin('FNORM_TOL', fnormtol, ier)
 call fkinsetrin('SSTEP_TOL', scsteptol, ier)
 call fkinsetiin('MAX_NITER', max_niter, ier)
 
-do i = 1, neq  !constraint vector 
-!do i = 1, neq/3 		!!GGG 
-!  constr(i) = 2.0
-   constr(i) = 0.0
+!do i = 1, neq  !constraint vector 
+do i = 1, neq/3 		!!GGG 
+  constr(i) = 2.0
+!   constr(i) = 0.0
 enddo
-do i = 1, neq/2  !constraint vector
-!!do i = neq/3, 2*neq/3
-!  constr(i) = 0.0
-   constr(i) = 2.0
+!do i = 1, neq/2  !constraint vector
+do i = neq/3+1, 2*neq/3
+ constr(i) = 0.0
+!   constr(i) = 2.0
 enddo
 
-!do i = 2*neq/3, neq !constraint vector
-!  constr(i) = 1.0
-!enddo
+do i = 2*neq/3+1, neq !constraint vector
+ constr(i) = 2.0
+enddo
 
 call fkinsetvin('CONSTR_VEC', constr, ier) ! constraint vector
 ! CALL FKINSPTFQMR (MAXL, IER)
@@ -166,9 +165,6 @@ endif
 call fkinspilssetprec(1, ier) ! preconditiones
 
 do i = 1, neq ! scaling vector
-  scale(i) = 1.0
-enddo
-do i = 1, neq/2 ! scaling vector
   scale(i) = 1.0
 enddo
 

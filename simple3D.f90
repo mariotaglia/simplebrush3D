@@ -17,7 +17,8 @@ if(rank.eq.0)print*, 'MPI OK'
 
 call initconst
 call initall
-call allocation
+call ctinit
+call allocation   !!  G:  ver 
 
 verbose = 5
 
@@ -128,13 +129,26 @@ dielW = 78.54
 dielPr = dielP/dielW
 dielSr = dielS/dielW
 
-Ka=10**(-pKa)
+zpolA = -1.0      ! charge of polyelectrolyte segment A			 G::
+zpolB = 1.0      ! charge of polyelectrolyte segment B		 	G ::
+
+pKw = 14.0				!G::
+kW=10**(-pKw)		!G::
+KaA=10**(-pKaA)
+KaB=10**(-pKaB)
+KEo=10**(-pKEo) !!!!!!!!!!!!!!!!!!!!!!!
+KaANa=10**(-pKaANa)
+KaBCl=10**(-pKaBCl)
+
+
+
 cHplus = 10**(-pHbulk)    ! concentration H+ in bulk
 xHplusbulk = (cHplus*Na/(1.0d24))*(vsol)  ! volume fraction H+ in bulk vH+=vsol
 pOHbulk= pKw -pHbulk
 cOHmin = 10**(-pOHbulk)   ! concentration OH- in bulk
 xOHminbulk = (cOHmin*Na/(1.0d24))*(vsol)  ! volume fraction H+ in bulk vH+=vsol  
 xsalt=(csalt*Na/(1.0d24))*(vsalt*vsol)   ! volume fraction salt,csalt in mol/l 
+
 if(pHbulk.le.7) then  ! pH<= 7
   xposbulk=xsalt/zpos
   xnegbulk=-xsalt/zneg+(xHplusbulk -xOHminbulk) *vsalt ! NaCl+ HCl  
@@ -144,7 +158,15 @@ else                  ! pH >7
 endif
 
 xsolbulk=1.0 -xHplusbulk -xOHminbulk -xnegbulk -xposbulk 
-K0 = (Ka*vsol/xsolbulk)*(Na/1.0d24)! intrinstic equilibruim constant 
+
+!K0 = (Ka*vsol/xsolbulk)*(Na/1.0d24)! intrinstic equilibruim constant 
+
+K0A = (KaA*vsol/xsolbulk)*(Na/1.0d24)! intrinstic equilibruim constant 
+K0ANa = (KaANa*vsol/xsolbulk)*(Na/1.0d24)! intrinstic equilibruim constant 
+K0BCl = (KaBCl*vsol/xsolbulk)*(Na/1.0d24)! intrinstic equilibruim constant 
+K0B = (Kw/KaB*vsol/xsolbulk)*(Na/1.0d24) 
+K0Eo = (KEo)*(1.0d24/Na) !!!!!!!!!!!!!!!!!!!!!!!
+
 expmupos = xposbulk /xsolbulk**vsalt
 expmuneg = xnegbulk /xsolbulk**vsalt
 expmuHplus = xHplusbulk /xsolbulk   ! vsol = vHplus 
@@ -182,14 +204,25 @@ read(8,*), cuantas
 read(8,*), basura
 read(8, *), dielP, dielS
 
-read(8,*), basura
-read(8, *), zpol
 
 read(8, *), basura
 read(8, *), csalt
 
+
 read(8, *), basura
-read(8, *), pKa
+read(8, *), pKaA    ! pKaA of weak polyacid segments
+
+read(8, *), basura
+read(8, *), pKaB    ! pKaB of weak polyacid segments
+
+read(8, *), basura
+read(8, *), pKaANa    ! pKaA of weak polyacid segments
+
+read(8, *), basura
+read(8, *), pKaBCl    ! pKaB of weak polyacid segments
+
+read(8, *), basura					!!!!!!!!!!!!!!!!!!!!!!!
+read(8, *), pKEo     ! Interation 	!!!!!!!!!!!!!!!!!!!!!!!
 
 read(8, *), basura
 read(8, *), pHbulk
@@ -248,7 +281,8 @@ implicit none
 integer cccc
 character*20 filename
 character*5  title
-real*8 temp(dimx,dimy,dimz)
+real*8 temp(dimx,dimy,dimz,2)
+real*8 temppsi(dimx,dimy,dimz) !!chequear G!!!!!!!!!!!!!!!!!!!1
 
 !----------------------------------------------------------
 !  OUTPUT
@@ -265,8 +299,9 @@ if(rank.eq.0) then ! solo el jefe escribe a disco....
 
 !!!!!!!!!!!!!!!!!!! Guarda archivos !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Polimero
+!!!!!!!!!!! es mejor  mantener dimensiones
 
-  temp(:,:,:) = avpol(:,:,:)
+  temp(:,:,:,:) = avpol(:,:,:,:)
 
   title = 'avpol'
   call savetodisk(temp, title, cccc)
@@ -291,7 +326,7 @@ if(rank.eq.0) then ! solo el jefe escribe a disco....
 !  call savetodisk(fdis, title, cccc)
 ! Potencial electrostatico
 
-  temp(1:dimx,1:dimy, 1:dimz) = psi(1:dimx,1:dimy, 1:dimz)
+  temppsi(1:dimx,1:dimy, 1:dimz) = psi(1:dimx,1:dimy, 1:dimz)
 
   title = 'poten'
   call savetodisk(temp, title, cccc)

@@ -1,11 +1,15 @@
 TARGET = simple3D
 
-SRC =  modules.f90 3D.f90 simple3D.f90 allocation.f90  allocatecpp.f90  cadenas.f90  fe.f90  fkfun.f90  kai.f90  kinsol.f90  pxs.f90  savetodisk.f90 rands.f90 dielectric.f90
+SRC =  modules.f90 3D.f90 simple3D.f90 allocation.f90  allocatecpp.f90  cadenas.f90  fe.f90  fkfun.f90  kai.f90  kinsol.f90  pxs.f90  savetodisk.f90 rands.f90 dielectric.f90 ct.f90
 
 
 HOST=$(shell hostname)
 $(info HOST is ${HOST})
 
+
+ifeq ($(HOST),mdq)
+LFLAGS = -lm /usr/lib/x86_64-linux-gnu/librt.so  -L/usr/local/lib  -lsundials_fkinsol -lsundials_kinsol -lsundials_fnvecserial -lsundials_nvecserial ${LIBS} -Wl,-rpath,/usr/local/lib
+endif
 
 ifeq ($(HOST),carapa)
 LFLAGS = -lsundials_fkinsol -lsundials_fnvecserial -lsundials_kinsol -lsundials_nvecserial -lm

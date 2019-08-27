@@ -17,7 +17,7 @@ ALLOCATE(xh(dimx, dimy, dimz))
 
 ! kinsol
 ALLOCATE (xflag(2*dimx*dimy*dimz))
-
+!ALLOCATE (xflag(3*dimx*dimy*dimz))
 ! results
 ALLOCATE (avpol(dimx, dimy, dimz,2))
 ALLOCATE (xpos(dimx, dimy, dimz)) ! pos ion
@@ -53,6 +53,7 @@ ALLOCATE (pp(2*dimx*dimy*dimz))
 
 ! chainsdat
 allocate(posicion(ncha,2))
+allocate(ct(ncha))
 allocate(in1(long,3))
 
 end subroutine
