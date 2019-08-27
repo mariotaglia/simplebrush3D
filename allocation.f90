@@ -16,8 +16,8 @@ ALLOCATE(q(ncha))
 ALLOCATE(xh(dimx, dimy, dimz))
 
 ! kinsol
-ALLOCATE (xflag(2*dimx*dimy*dimz))
-!ALLOCATE (xflag(3*dimx*dimy*dimz))
+!ALLOCATE (xflag(2*dimx*dimy*dimz))
+ALLOCATE (xflag(3*dimx*dimy*dimz))
 ! results
 ALLOCATE (avpol(dimx, dimy, dimz,2))
 ALLOCATE (xpos(dimx, dimy, dimz)) ! pos ion
@@ -49,7 +49,7 @@ allocate(KKaBcheckmin(dimx, dimy, dimz))
 !!G:!!!!!!!
 
 ! mkinsol
-ALLOCATE (pp(2*dimx*dimy*dimz))
+ALLOCATE (pp(3*dimx*dimy*dimz))
 
 ! chainsdat
 allocate(posicion(ncha,2))

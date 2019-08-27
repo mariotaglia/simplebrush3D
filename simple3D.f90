@@ -17,9 +17,9 @@ if(rank.eq.0)print*, 'MPI OK'
 
 call initconst
 call initall
-call ctinit
-call allocation   !!  G:  ver 
 
+call allocation   !!  G:  ver 
+call ctinit
 verbose = 5
 
 ! Calculate poor-solvent coefficients
@@ -281,8 +281,8 @@ implicit none
 integer cccc
 character*20 filename
 character*5  title
-real*8 temp(dimx,dimy,dimz,2)
-real*8 temppsi(dimx,dimy,dimz) !!chequear G!!!!!!!!!!!!!!!!!!!1
+real*8 temp(dimx,dimy,dimz)
+
 
 !----------------------------------------------------------
 !  OUTPUT
@@ -301,9 +301,15 @@ if(rank.eq.0) then ! solo el jefe escribe a disco....
 ! Polimero
 !!!!!!!!!!! es mejor  mantener dimensiones
 
-  temp(:,:,:,:) = avpol(:,:,:,:)
+  temp(:,:,:) = avpol(:,:,:,1)
 
-  title = 'avpol'
+  title = 'avpo1'
+  call savetodisk(temp, title, cccc)
+
+
+  temp(:,:,:) = avpol(:,:,:,2)
+
+  title = 'avpo2'
   call savetodisk(temp, title, cccc)
 
 ! Solvente
@@ -326,7 +332,7 @@ if(rank.eq.0) then ! solo el jefe escribe a disco....
 !  call savetodisk(fdis, title, cccc)
 ! Potencial electrostatico
 
-  temppsi(1:dimx,1:dimy, 1:dimz) = psi(1:dimx,1:dimy, 1:dimz)
+  temp(1:dimx,1:dimy, 1:dimz) = psi(1:dimx,1:dimy, 1:dimz)
 
   title = 'poten'
   call savetodisk(temp, title, cccc)
