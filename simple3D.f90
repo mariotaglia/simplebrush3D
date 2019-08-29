@@ -43,6 +43,7 @@ else
    infile = 2
    call solve
    call Free_Energy_Calc(counter)
+   call savedata(counter)
 endif
 
 call endall
@@ -118,6 +119,7 @@ if(rank.eq.0) then
        open(unit=311, file='F_electro.dat')
        open(unit=312, file='F_tot2.dat')
        open(unit=314, file='F_mixpos2.dat')
+       !open(unit=316, file='hcapa.dat')
 endif
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -279,23 +281,24 @@ use MPI
 use kinsol
 implicit none
 integer cccc
+integer n ,i
 character*20 filename
 character*5  title
 real*8 temp(dimx,dimy,dimz)
-
+n=dimx*dimy*dimz
 
 !----------------------------------------------------------
 !  OUTPUT
 !----------------------------------------------------------
 
 if(rank.eq.0) then ! solo el jefe escribe a disco....
-  ! Guarda infile
-!  write(filename,'(A4, I3.3, A4)')'out.', cccc, '.dat'
-!  open(unit=45, file=filename)
-!   do i = 1, 2*n
-!    write(45, *)x1(i)
-!   enddo
-!  close(45)
+ !Guarda infile
+  write(filename,'(A4, I3.3, A4)')'out.', cccc, '.dat'
+  open(unit=45, file=filename)
+   do i = 1, 3*n
+    write(45, *)xflag(i)
+   enddo
+  close(45)
 
 !!!!!!!!!!!!!!!!!!! Guarda archivos !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Polimero
@@ -328,8 +331,10 @@ if(rank.eq.0) then ! solo el jefe escribe a disco....
 !  title = 'avOHm'
 !  call savetodisk(xOHmin, title, cccc)
 ! fdis
-!  title = 'frdis'
-!  call savetodisk(fdis, title, cccc)
+  title = 'fdisa'
+ call savetodisk(fdisAas, title, cccc)
+  title = 'fdisb'
+ call savetodisk(fdisBas, title, cccc)
 ! Potencial electrostatico
 
   temp(1:dimx,1:dimy, 1:dimz) = psi(1:dimx,1:dimy, 1:dimz)
@@ -385,13 +390,14 @@ use kinsol
 use results
 use const
 implicit none
-integer counter
+integer counter,i,n
+counter=1
+n=dimx*dimy*dimz
 
-open (unit=8, file='in.in', form='unformatted')
-read(8)counter
-read(8)seed
-read(8)xflag
-close(8)
+open (unit=8,file='in.in')
+   do i = 1, 3*n
+    read(8, *)xflag(i)
+   enddo
+ close(8)
 end subroutine
-
-
+ 

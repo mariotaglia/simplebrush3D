@@ -435,9 +435,6 @@ endif
    		sumas= (delta**3/vsol)*sumas		
          sum = sumpi + sumrho + sumel + sumdiel+sumas
 
-         sum = sumpi + sumrho + sumel + sumdiel
-
-
          do ii = 1, ncha
          Free_Energy2 = Free_Energy2-dlog(q0(ii)/shift) 
          enddo
@@ -483,30 +480,25 @@ endif
 !        mupolB = mupolB - dlog(qB0(ii)/shiftB)
 !        enddo
 !        mupolB = mupolB/ncha
-!
-!!G: h sin el factor dos
-
-! EL h  está sin el factor 2 multiplicando 
 	
 !h capa 
+	!		hcapa=0.0
 !			normhcapa=0.0
 
-!      do ix  = 1, dimx!
-!      do iy  = 1, dimy
-!      do iz  = 1, dimz
+ !      do ix  = 1, dimx!
+ !      do iy  = 1, dimy
+ !      do iz  = 1, dimz
 
-!
-!				normhcapa=normhcapa+(avpolA(ix,iy,iz)+avpolB(ix,iy,iz))*delta**3/vpol
-!				hcapa=hcapa+(avpolA(ix,iy,iz)+avpolB(ix,iy,iz))*(ix+iy+iz)*delta*delta**3/vpol
+	!			normhcapa=normhcapa+(avpol(ix,iy,iz,1)+avpol(ix,iy,iz,2))*delta**3/vpol
+!				hcapa=hcapa+(avpol(ix,iy,iz,1)+avpol(ix,iy,iz,2))*(ix+iy+iz)*delta*delta**3/vpol
 
-!			enddo
+!			enddo!
 !			enddo
 !			enddo
 !			if(1.0d-10 <normhcapa)then
-!				hcapa=2.0*hcapa/normhcapa
-!			!endif
+!				hcapa=2.0*hcapa/normhcapa!
+!		  endif
 
-!!!!!!!!!!!!!gg!!!!!!!!!!
           if(rank.eq.0) then
 
  
@@ -528,7 +520,7 @@ endif
          write(313,*)looped, mupol
 !!       write(313,*)looped, mupolA
 !!       write(313,*)looped, mupolB
-!!			write(316,*)cc, ccc, hcapa
+!			write(316,*)cc, ccc, hcapa
 
          endif
  
