@@ -309,7 +309,7 @@ do iy = 1, ilado_y
 !	posicion(j,1)=	posicion(j,1)+(rand()-0.5)*delta*2
 !	posicion(j,2)=	posicion(j,2)+(rand()-0.5)*delta*2
 !  temp=(rand()-0.5)*delta*2
-  temp=delta
+  temp=delta*0.5
 select case (j)
  case (1,5,33,37)
  posicion(j,1) = postempx*delta + temp

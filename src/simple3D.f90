@@ -10,8 +10,16 @@ logical flag
 
 counter = 1
 counterr = 1
+!!barrida en pkeo
+
+!ipkeomax=8
+!do ipkeo=1:ipkeomax
+!	pkEo=2-ipkeo
+	
+!enddo
 
 call readinput
+
 call initmpi
 if(rank.eq.0)print*, 'MPI OK'
 
