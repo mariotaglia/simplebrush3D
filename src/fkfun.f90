@@ -347,7 +347,6 @@ do ix=1,dimx
 enddo
 
 ! Poisson eq.
-!!G::  ESTE NO LO TOCO
 
 do ix=1,dimx
    do iy=1,dimy

@@ -6,6 +6,12 @@ integer  dimz
 real*8 gama 
 endmodule
 
+module pks
+integer npkeo
+real*8 pkeos(100)
+
+endmodule
+
 module mkinsol
 double precision, allocatable :: pp(:)
 endmodule
