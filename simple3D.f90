@@ -2,52 +2,99 @@ use system
 use MPI
 use kinsol
 use const
+use inputtemp
+use pks
+use molecules
+use bulk
+use chainsdat
+
 implicit none
 integer counter, counterr
 real*8 temp
 real*8, external :: rands
 logical flag
+integer i, flagcrash
+real*8 pkeook
 
 counter = 1
 counterr = 1
 
-call readinput
-call initmpi
+ call readinput
+
+ call initmpi
 if(rank.eq.0)print*, 'MPI OK'
+!!!!!
+!call initconst
+!call initall
 
-call initconst
-call initall
-
-call allocation   !!  G:  ver 
-call ctinit
+ call allocation   !!  G:  ver 
+ call ctinit
 verbose = 5
 
+pkEo=0
+call initconst
+call initall
 ! Calculate poor-solvent coefficients
-call kais
+ call kais
 if(rank.eq.0)print*, 'Kai OK'
 
-call  graftpoints
+ call  graftpoints
 if(rank.eq.0)print*, 'Graftpoints OK'
 
-call creador ! Genera cadenas
+ call creador ! Genera cadenas
 if(rank.eq.0)print*, 'Creador OK'
 
-if(infile.eq.0) then
-   call solve
-   call Free_Energy_Calc(counter)
-   call savedata(counter)
-else
+if(infile.ne.0) then
    call retrivefromdisk(counter)
    counterr = counter
    if(rank.eq.0)print*, 'Load input from file'
-   infile = 2
-   call solve
-   call Free_Energy_Calc(counter)
-   call savedata(counter)
+
+ 
 endif
 
-call endall
-end
+	!!
+
+	pkEo=pkEos(1)-0.1
+	do i = 1, npkeo !long pkeos
+		do while (pkEo.ne.pkEos(i))
+			pkEo = pkEos(i)
+			if(rank.eq.0)print*,'Switch to pkEo = ', pkEo
+				flagcrash = 1
+				do while(flagcrash.eq.1)
+				flagcrash = 0
+				
+				call initconst
+				
+				call initall			
+
+				call solve(flagcrash)
+				if(flagcrash.eq.1) then
+				if(i.eq.1)stop
+				pkEo = (pkEo + pkEoOK)/2.0
+				if(rank.eq.0)print*,'Error, switch to pkEo = ', pkEo
+				endif
+	      	enddo
+
+			pkEoOK = pkEo ! last st solved OK
+			if(rank.eq.0)print*, 'Solved OK, pkEo: ', pkEoOK
+
+		enddo
+
+		counterr = counter + i   - 1
+		call Free_Energy_Calc(counterr)
+		call savedata(counterr)
+		if(rank.eq.0)print*, 'Save OK'
+		call store2disk(counterr)
+
+	enddo
+
+!!
+!   call solve
+ !  call Free_Energy_Calc(counter)
+  ! call savedata(counter)
+	
+ call endall
+ end
 
 
 subroutine initmpi
@@ -82,7 +129,7 @@ zpos = 1.0
 zneg = -1.0
 vsol = 0.030
 vsalt=((4.0/3.0)*pi*(0.2)**3)/vsol  ! volume salt in units of vsol 0.2=radius salt  
-vpol= 0.11/vsol ! ((4.0/3.0)*pi*(0.2)**3)/vsol  ! volume polymer segment in units of vsol 
+vpol= 0.06/vsol ! ((4.0/3.0)*pi*(0.2)**3)/vsol  ! volume polymer segment in units of vsol 
 constq=delta*delta*4.0*pi*lb/vsol   ! multiplicative factor in poisson eq  
 pKw = 14
 error = 1e-4 ! para comparar con la norma...
@@ -182,11 +229,12 @@ use molecules
 use const
 use bulk
 use MPI
+use pks
 use chainsdat
 use inputtemp
 implicit none
 character basura
-
+integer i
 !!!!!!!!!!!!!!!!!!!!!!!!!
 ! Read input variables
 !!!!!!!!!!!!!!!!!!!!!!!!!
@@ -206,10 +254,8 @@ read(8,*), cuantas
 read(8,*), basura
 read(8, *), dielP, dielS
 
-
 read(8, *), basura
 read(8, *), csalt
-
 
 read(8, *), basura
 read(8, *), pKaA    ! pKaA of weak polyacid segments
@@ -223,8 +269,13 @@ read(8, *), pKaANa    ! pKaA of weak polyacid segments
 read(8, *), basura
 read(8, *), pKaBCl    ! pKaB of weak polyacid segments
 
+read(8,*), basura
+read(8,*), npkeo
+
 read(8, *), basura					!!!!!!!!!!!!!!!!!!!!!!!
-read(8, *), pKEo     ! Interation 	!!!!!!!!!!!!!!!!!!!!!!!
+do i=1, npkeo
+read(8, *), pKEos(i)     ! Interation 	!!!!!!!!!!!!!!!!!!!!!!!
+enddo
 
 read(8, *), basura
 read(8, *), pHbulk
@@ -316,25 +367,29 @@ if(rank.eq.0) then ! solo el jefe escribe a disco....
   call savetodisk(temp, title, cccc)
 
 ! Solvente
-!  title = 'avsol'
-!  call savetodisk(xh, title, cccc)
+  title = 'avsol'
+  call savetodisk(xh, title, cccc)
 ! Cationes
-!  title = 'avpos'
-!  call savetodisk(xpos, title, cccc)
+  title = 'avpos'
+  call savetodisk(xpos, title, cccc)
 ! Aniones
-!  title = 'avneg'
-!  call savetodisk(xneg, title, cccc)
+  title = 'avneg'
+  call savetodisk(xneg, title, cccc)
 ! H+
-!  title = 'avHpl'
-!  call savetodisk(xHplus, title, cccc)
+  title = 'avHpl'
+  call savetodisk(xHplus, title, cccc)
 ! OH-
-!  title = 'avOHm'
-!  call savetodisk(xOHmin, title, cccc)
+  title = 'avOHm'
+  call savetodisk(xOHmin, title, cccc)
 ! fdis
   title = 'fdisa'
  call savetodisk(fdisAas, title, cccc)
   title = 'fdisb'
  call savetodisk(fdisBas, title, cccc)
+  title = 'fdANa'
+ call savetodisk(fdisANa, title, cccc)
+  title = 'fdBCl'
+ call savetodisk(fdisBCl, title, cccc)
 ! Potencial electrostatico
 
   temp(1:dimx,1:dimy, 1:dimz) = psi(1:dimx,1:dimy, 1:dimz)

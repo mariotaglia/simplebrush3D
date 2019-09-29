@@ -281,8 +281,11 @@ real*8 temp
 real*8 lado, postempx, postempy
 real*8 lado_x, lado_y
 integer ix, iy, j, ilado_x, ilado_y
- 
-lado = sqrt(dfloat(dimx*dimy/(ncha)))
+
+seed = 86456
+
+
+lado = sqrt(dfloat(dimx*dimy/(ncha/2)))
 lado_x = dimx/lado  ! array
 lado_y = dimy/lado 
 ilado_x = int(lado_x)
@@ -294,49 +297,58 @@ do iy = 1, ilado_y
 
  postempx = dimx/2.0/lado_x + (ix-1)*dimx/lado_x
  postempy = dimy/2.0/lado_y + (iy-1)*dimy/lado_y
- if(randominput.ne.1) then
+
  posicion(j,1) = postempx*delta 
  posicion(j,2) = postempy*delta 
- endif
 
- temp = delta
+ temp = 0.0!delta!!gabi
 
  if(randominput.eq.1) then
-
- select case (j)
- case (1)
+	call srand(seed)
+	!print *, rand()
+!	posicion(j,1)=	posicion(j,1)+(rand()-0.5)*delta*2
+!	posicion(j,2)=	posicion(j,2)+(rand()-0.5)*delta*2
+!  temp=(rand()-0.5)*delta*2
+ temp=delta*0.5
+select case (j)
+ case (1,5,33,37)
  posicion(j,1) = postempx*delta + temp
  posicion(j,2) = postempy*delta + temp
- case (2, 3)
+ case (2, 3,6,7,34,35,38,39)
  posicion(j,1) = postempx*delta + temp
  posicion(j,2) = postempy*delta 
- case (4)
+ case (4,8,36,40)
  posicion(j,1) = postempx*delta + temp
  posicion(j,2) = postempy*delta - temp
- case (5, 9)
+ case (9,13,17,21,41,45,49,53)
  posicion(j,1) = postempx*delta 
  posicion(j,2) = postempy*delta + temp
- case (6, 7, 10, 11)
+ case (10, 11,14,15,18,19,22,23,42,43,46,47,50,51,54,55)
  posicion(j,1) = postempx*delta  
  posicion(j,2) = postempy*delta
- case (8, 12)
+ case (12,16,20,24,44,48,52,56)
  posicion(j,1) = postempx*delta 
  posicion(j,2) = postempy*delta - temp
- case (13)
+ case (25,29,57,61)
  posicion(j,1) = postempx*delta - temp
  posicion(j,2) = postempy*delta + temp
- case (14, 15)
+ case (26,27,30,31,58,59,62,63)
  posicion(j,1) = postempx*delta - temp
  posicion(j,2) = postempy*delta 
- case (16)
+ case (28,32,60,64)
  posicion(j,1) = postempx*delta - temp
  posicion(j,2) = postempy*delta - temp
  endselect
+
  endif
 
  j = j + 1
 
 enddo
+enddo
+
+do j = ncha/2+1, ncha
+posicion(j,:)=posicion(j-ncha/2,:)
 enddo
 
 end

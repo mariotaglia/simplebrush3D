@@ -30,6 +30,8 @@ parameter(tag = 0)
 integer err
 real*8 avpol_tosend(dimx,dimy,dimz,2)
 real*8 avpol_temp(dimx,dimy,dimz)
+real*8 xndiff(dimx,dimy,dimz)
+real*8 xnsum(dimx,dimy,dimz)
 real*8 volprot(dimx,dimy,dimz)
 real*8 q_tosend
 real*8 gradpsi2
@@ -45,7 +47,7 @@ volprot = 0.0
 if(rank.eq.0) then ! llama a subordinados y pasa vector x
    flagsolver = 1
    CALL MPI_BCAST(flagsolver, 1, MPI_INTEGER, 0, MPI_COMM_WORLD,err)
-   CALL MPI_BCAST(x, 3*dimx*dimy*dimz , MPI_DOUBLE_PRECISION,0, MPI_COMM_WORLD,err)
+   CALL MPI_BCAST(x, dimx*dimy*dimz , MPI_DOUBLE_PRECISION,0, MPI_COMM_WORLD,err)
 endif
 
 !------------------------------------------------------
@@ -63,14 +65,14 @@ ntot = dimx*dimy*dimz ! numero de celdas
 do ix=1,dimx
  do iy=1,dimy
   do iz=1,dimz
-     xh(ix,iy,iz)=x(ix+dimx*(iy-1)+dimx*dimy*(iz-1))
-     psi(ix,iy,iz)=x(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot)   
-     xna(ix,iy,iz)=x(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot+ntot)   
+     xh(ix,iy,iz)= x(ix+dimx*(iy-1)+dimx*dimy*(iz-1))
+     psi(ix,iy,iz)=0.0 
+     xndiff(ix,iy,iz)= 0.0 
   enddo
  enddo
 enddo
-      
-! Condiciones de borde potencial electrostatico
+     
+
 ! en x
  
 do iy = 1, dimy
@@ -111,19 +113,21 @@ enddo
 do ix=1,dimx
  do iy=1,dimy
   do iz=1,dimz
-!    avpol(ix,iy,iz)=0.0	
     xpos(ix, iy, iz) = expmupos*(xh(ix, iy, iz)**vsalt)*dexp(-psi(ix, iy, iz)*zpos) ! ion plus volume fraction 
     xneg(ix, iy, iz) = expmuneg*(xh(ix, iy, iz)**vsalt)*dexp(-psi(ix, iy, iz)*zneg) ! ion neg volume fraction
     xHplus(ix, iy, iz) = expmuHplus*(xh(ix, iy, iz))*dexp(-psi(ix, iy, iz))           ! H+ volume fraction
     xOHmin(ix, iy,iz) = expmuOHmin*(xh(ix,iy,iz))*dexp(+psi(ix,iy,iz))           ! OH-  volume fraction
-    !fdis(ix,iy,iz)=1.0 /(1.0 + xHplus(ix,iy,iz)/(K0*xh(ix,iy,iz)) )
 
 !!G::
-	xnb(ix,iy,iz)=1.0-xna(ix,iy,iz)-xh(ix,iy,iz)-xpos(ix,iy,iz)-xneg(ix,iy,iz)-xHplus(ix,iy,iz)-xOHmin(ix,iy,iz)
+	xnsum(ix,iy,iz)=1.0-xh(ix,iy,iz)-xpos(ix,iy,iz)-xneg(ix,iy,iz)-xHplus(ix,iy,iz)-xOHmin(ix,iy,iz)
+
+ xna(ix,iy,iz) = (xnsum(ix,iy,iz) + xndiff(ix,iy,iz))/2.0
+ xnb(ix,iy,iz) = (xnsum(ix,iy,iz) - xndiff(ix,iy,iz))/2.0
+
 	fdisAas(ix,iy,iz)=0.0d0 													
 	fdisBas(ix,iy,iz)=0.0d0			
 !
-if ((1.0d-6 .lt. xna(ix,iy,iz)).AND.(1.0d-6 .lt. xnb(ix,iy,iz))) THEN
+if ((1.e-10 .lt. xna(ix,iy,iz)).AND.(1.e-10 .lt. xnb(ix,iy,iz))) THEN
 	eta(ix,iy,iz)=xna(ix,iy,iz)/xnb(ix,iy,iz)
 
 M(ix,iy,iz)=( 1.0+ (xOHmin(ix,iy,iz))/(K0B*xh(ix,iy,iz))+(xneg(ix,iy,iz)/(K0BCl*xh(ix,iy,iz)**vsalt)) )*( 1.0&
@@ -142,15 +146,6 @@ M(ix,iy,iz)=( 1.0+ (xOHmin(ix,iy,iz))/(K0B*xh(ix,iy,iz))+(xneg(ix,iy,iz)/(K0BCl*
 	fdisANa(ix,iy,iz) = (fdisANC(ix,iy,iz))*(K0A*xpos(ix,iy,iz)* (xh(ix,iy,iz)**(1.0-vsalt)) )/(xHplus(ix,iy,iz)*K0ANa)
 	fdisBCl(ix,iy,iz) = (fdisBNC(ix,iy,iz))*(K0B*xneg(ix,iy,iz)* (xh(ix,iy,iz)**(1.0-vsalt)) )/(xOHmin(ix,iy,iz)*K0BCl)
 
-			!KK0check(ix,iy,iz)=-dlog10( (Na/1.0d24)*fdisBas(ix,iy,iz)/(	(1.0-fdisAas(ix,iy,iz)-fdisANa(ix,iy,iz)&
-!-fdisANC(ix,iy,iz))*(1.0-fdisBas(ix,iy,iz)-fdisBNC(ix,iy,iz)-fdisBCl(ix,iy,iz))*xna(ix,iy,iz) )	)/pKeo
-		!	KKaAcheckplus(ix,iy,iz)= -dlog10( (xHplus(ix,iy,iz)/xh(ix,iy,iz))*((1-fdisANC(ix,iy,iz)-fdisANa(ix,iy,iz)&
-!-fdisAas(ix,iy,iz))/fdisANC(ix,iy,iz))*(xsolbulk*1.0d24/(Na*vsol)))-pKaA !! esto era para chequear pkaA
-		!	kkaBcheckmin(ix,iy,iz)=	 (xOhmin(ix,iy,iz)/xh(ix,iy,iz))*(1.0-fdisBas(ix,iy,iz)-fdisBCl(ix,iy,iz)-fdisBNC(ix,iy,iz))/fdisBNC(ix,iy,iz)-K0B
-		!	KKaANa(ix,iy,iz)= dlog10( (xh(ix,iy,iz)/xpos(ix,iy,iz))*(fdisANa(ix,iy,iz)/(1-fdisANC(ix,iy,iz)-fdisANa(ix,iy,iz)&
-!-fdisAas(ix,iy,iz)))*(xsolbulk*1.0d24/(Na*vsol)))/pKaAna !! esto era para chequear pkaA
-		!	KKaBCl(ix,iy,iz)= dlog10( (xh(ix,iy,iz)/xneg(ix,iy,iz))/((1-fdisBNC(ix,iy,iz)-fdisBCl(ix,iy,iz)&
-!-fdisBas(ix,iy,iz))/fdisBCl(ix,iy,iz))*(xsolbulk*1.0d24/(Na*vsol)))/pkaBCl !! esto era para chequear pkaA
 
 
 !!G:
@@ -347,41 +342,42 @@ do ix=1,dimx
 enddo
 
 ! Poisson eq.
-!!G::  ESTE NO LO TOCO
 
-do ix=1,dimx
-   do iy=1,dimy
-       do iz=1,dimz
+!do ix=1,dimx
+!   do iy=1,dimy
+!       do iz=1,dimz
+!
+!       psitemp = epsfcn(ix,iy,iz)*(psi(ix+1, iy, iz)-2*psi(ix, iy, iz)+psi(ix-1, iy, iz)) 
+!       psitemp = psitemp + epsfcn(ix,iy,iz)*(psi(ix, iy+1, iz)-2*psi(ix, iy, iz)+psi(ix, iy-1, iz))
+!       psitemp = psitemp + epsfcn(ix,iy,iz)*(psi(ix, iy, iz+1) -2*psi(ix, iy, iz) + psi(ix, iy, iz-1))
 
-       psitemp = epsfcn(ix,iy,iz)*(psi(ix+1, iy, iz)-2*psi(ix, iy, iz)+psi(ix-1, iy, iz)) 
-       psitemp = psitemp + epsfcn(ix,iy,iz)*(psi(ix, iy+1, iz)-2*psi(ix, iy, iz)+psi(ix, iy-1, iz))
-       psitemp = psitemp + epsfcn(ix,iy,iz)*(psi(ix, iy, iz+1) -2*psi(ix, iy, iz) + psi(ix, iy, iz-1))
-
-       psitemp = psitemp + (psi(ix+1,iy,iz)-psi(ix-1,iy,iz))*(epsfcn(ix+1,iy,iz)-epsfcn(ix-1,iy,iz))/4.0
-       psitemp = psitemp + (psi(ix,iy+1,iz)-psi(ix,iy-1,iz))*(epsfcn(ix,iy+1,iz)-epsfcn(ix,iy-1,iz))/4.0
-       psitemp = psitemp + (psi(ix,iy,iz+1)-psi(ix,iy,iz-1))*(epsfcn(ix,iy,iz+1)-epsfcn(ix,iy,iz-1))/4.0
+!       psitemp = psitemp + (psi(ix+1,iy,iz)-psi(ix-1,iy,iz))*(epsfcn(ix+1,iy,iz)-epsfcn(ix-1,iy,iz))/4.0
+!       psitemp = psitemp + (psi(ix,iy+1,iz)-psi(ix,iy-1,iz))*(epsfcn(ix,iy+1,iz)-epsfcn(ix,iy-1,iz))/4.0
+!       psitemp = psitemp + (psi(ix,iy,iz+1)-psi(ix,iy,iz-1))*(epsfcn(ix,iy,iz+1)-epsfcn(ix,iy,iz-1))/4.0
 
 
-      f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot)=(psitemp + &
-      qtot(ix, iy, iz)*constq)/(-2.0)
+!      f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot)=(psitemp + &
+!      qtot(ix, iy, iz)*constq)/(-2.0)
 
-      enddo
-   enddo
-enddo
+!      f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot)= 0.0 
+!      enddo
+!   enddo
+!enddo
  
 ! third block of f, ASSOCIATE RELATION
  
-do ix=1,dimx
-   do iy=1,dimy
-       do iz=1,dimz
-			 f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot+ntot)=xna(ix,iy,iz)-avpol(ix,iy,iz,1) !	
-      enddo
-  enddo
-enddo
+!do ix=1,dimx
+!   do iy=1,dimy
+!       do iz=1,dimz
+!			 f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ntot+ntot)=xndiff(ix,iy,iz)-(avpol(ix,iy,iz,1)-avpol(ix,iy,iz,2)) !	
+!      enddo
+!  enddo
+!enddo
+
 
 norma = 0.0
 
-do i = 1, 3*ntot
+do i = 1, ntot
   norma = norma + (f(i))**2
 enddo
 

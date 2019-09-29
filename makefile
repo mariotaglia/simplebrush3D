@@ -2,14 +2,9 @@ TARGET = simple3D
 
 SRC =  modules.f90 3D.f90 simple3D.f90 allocation.f90  allocatecpp.f90  cadenas.f90  fe.f90  fkfun.f90  kai.f90  kinsol.f90  pxs.f90  savetodisk.f90 rands.f90 dielectric.f90 ct.f90
 
-
 HOST=$(shell hostname)
 $(info HOST is ${HOST})
 
-
-ifeq ($(HOST),mdq)
-LFLAGS = -lm /usr/lib/x86_64-linux-gnu/librt.so  -L/usr/local/lib  -lsundials_fkinsol -lsundials_kinsol -lsundials_fnvecserial -lsundials_nvecserial ${LIBS} -Wl,-rpath,/usr/local/lib
-endif
 
 ifeq ($(HOST),carapa)
 LFLAGS = -lsundials_fkinsol -lsundials_fnvecserial -lsundials_kinsol -lsundials_nvecserial -lm
@@ -33,6 +28,8 @@ endif
 # some definitions
 SHELL = /bin/bash
 FFLAGS= -O3 # -fbacktrace -fbounds-check # -O3
+
+LFLAGS =  -L/opt/local/sundials-2.5.0-openmpi-atlas/lib -lsundials_fkinsol -lsundials_kinsol -lsundials_fnvecserial -lsundials_nvecserial -lm -L/usr/lib/gcc/x86_64-linux-gnu/4.6.1 -L/usr/lib/gcc/x86_64-linux-gnu/4.6.1/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.6.1/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.6.1/../../.. -lgfortran -lm -lgcc_s -lquadmath
 
 ifeq ($(HOST),piluso.rosario-conicet.gov.ar)
 LFLAGS = -L/home/mtagliazucchi.inquimae/software/kinsol/lib -lsundials_fkinsol -lsundials_kinsol -lsundials_fnvecserial -lsundials_nvecserial -lm -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. -lgfortranbegin -lgfortran -lm -lgcc_s
@@ -74,7 +71,7 @@ endif
 GIT_VERSION := $(shell git describe --abbrev=6 --dirty --always --tags)
 GFLAGS=-cpp -D_VERSION=\"$(GIT_VERSION)\"
 
-FF = mpif77 #${F90}
+FF = /opt/local/openmpi-1.8.8/bin/mpif77 #${F90}
 VER = ~/bin/crystal
 
 all:	$(TARGET)
