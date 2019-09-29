@@ -129,7 +129,7 @@ zpos = 1.0
 zneg = -1.0
 vsol = 0.030
 vsalt=((4.0/3.0)*pi*(0.2)**3)/vsol  ! volume salt in units of vsol 0.2=radius salt  
-vpol= 0.06/vsol ! ((4.0/3.0)*pi*(0.2)**3)/vsol  ! volume polymer segment in units of vsol 
+vpol= 0.11/vsol ! ((4.0/3.0)*pi*(0.2)**3)/vsol  ! volume polymer segment in units of vsol 
 constq=delta*delta*4.0*pi*lb/vsol   ! multiplicative factor in poisson eq  
 pKw = 14
 error = 1e-4 ! para comparar con la norma...
@@ -364,38 +364,38 @@ if(rank.eq.0) then ! solo el jefe escribe a disco....
   temp(:,:,:) = avpol(:,:,:,2)
 
   title = 'avpo2'
-  call savetodisk(temp, title, cccc)
+!  call savetodisk(temp, title, cccc)
 
 ! Solvente
   title = 'avsol'
-  call savetodisk(xh, title, cccc)
+!  call savetodisk(xh, title, cccc)
 ! Cationes
   title = 'avpos'
-  call savetodisk(xpos, title, cccc)
+!  call savetodisk(xpos, title, cccc)
 ! Aniones
   title = 'avneg'
-  call savetodisk(xneg, title, cccc)
+!  call savetodisk(xneg, title, cccc)
 ! H+
   title = 'avHpl'
-  call savetodisk(xHplus, title, cccc)
+!  call savetodisk(xHplus, title, cccc)
 ! OH-
   title = 'avOHm'
-  call savetodisk(xOHmin, title, cccc)
+!  call savetodisk(xOHmin, title, cccc)
 ! fdis
   title = 'fdisa'
  call savetodisk(fdisAas, title, cccc)
   title = 'fdisb'
- call savetodisk(fdisBas, title, cccc)
+! call savetodisk(fdisBas, title, cccc)
   title = 'fdANa'
  call savetodisk(fdisANa, title, cccc)
   title = 'fdBCl'
- call savetodisk(fdisBCl, title, cccc)
+! call savetodisk(fdisBCl, title, cccc)
 ! Potencial electrostatico
 
   temp(1:dimx,1:dimy, 1:dimz) = psi(1:dimx,1:dimy, 1:dimz)
 
   title = 'poten'
-  call savetodisk(temp, title, cccc)
+!  call savetodisk(temp, title, cccc)
 
 ! system
 
