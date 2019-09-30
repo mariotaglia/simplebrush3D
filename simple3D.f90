@@ -346,7 +346,7 @@ if(rank.eq.0) then ! solo el jefe escribe a disco....
  !Guarda infile
   write(filename,'(A4, I3.3, A4)')'out.', cccc, '.dat'
   open(unit=45, file=filename)
-   do i = 1, 3*n
+   do i = 1, n
     write(45, *)xflag(i)
    enddo
   close(45)
@@ -450,7 +450,7 @@ counter=1
 n=dimx*dimy*dimz
 
 open (unit=8,file='in.in')
-   do i = 1, 3*n
+   do i = 1, n
     read(8, *)xflag(i)
    enddo
  close(8)
