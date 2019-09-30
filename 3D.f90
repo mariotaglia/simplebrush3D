@@ -122,8 +122,8 @@ do ix=1,dimx
    do iy=1,dimy
       do iz=1,dimz
        xh(ix,iy,iz)=x1(ix+dimx*(iy-1)+dimx*dimy*(iz-1))
-       psi(ix,iy,iz)=x1(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+n)
-       xna(ix,iy,iz)=x1(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+n+n)
+       psi(ix,iy,iz)=0.0 !x1(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+n)
+!       xna(ix,iy,iz)=x1(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+n+n)
       enddo
    enddo  
 enddo
