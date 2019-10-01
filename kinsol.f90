@@ -101,13 +101,13 @@ integer ierr
 ! INICIA KINSOL
 
 neq = dimx*dimy*dimz
-msbpre  = 100 ! maximum number of iterations without prec. setup (?)
+msbpre  = 10 ! maximum number of iterations without prec. setup (?)
 fnormtol = 1.0d-6 ! Function-norm stopping tolerance
 scsteptol = 1.0d-6 ! Function-norm stopping tolerance
 
 maxl = 2000 ! maximum Krylov subspace dimesion (?!?!?!) ! Esto se usa para el preconditioner
-maxlrst = 500 ! maximum number of restarts
-max_niter = 2000
+maxlrst = 50 ! maximum number of restarts
+max_niter = 200
 globalstrat = 0
 
 call fnvinits(3, neq, ier) ! fnvinits inits NVECTOR module
@@ -163,7 +163,6 @@ call fkinsol(x1, globalstrat, scale, scale, ier)         ! Llama a kinsol
 if (ier .lt. 0) then
       print*, 'call_kinsol: SUNDIALS_ERROR: FKINSOL returned IER = ', ier
       print*, 'call_kinsol: Linear Solver returned IER = ', iout(9)
-      call fkinfree
 endif
 
 do i = 1, neq ! output
