@@ -283,8 +283,6 @@ real*8 lado_x, lado_y
 integer ix, iy, j, ilado_x, ilado_y
 real*8 rands
 
-seed = mvseed
-
 
 lado = sqrt(dfloat(dimx*dimy/(ncha/2)))
 lado_x = dimx/lado  ! array
@@ -305,8 +303,8 @@ do iy = 1, ilado_y
  temp = 0.0!delta!!gabi
 
  if(randominput.eq.1) then
-        posicion(j,1)= posicion(j,1)+(rands(seed)-0.5)*delta/2.0
-        posicion(j,2)= posicion(j,2)+(rands(seed)-0.5)*delta/2.0
+        posicion(j,1)= posicion(j,1)+(rands(mvseed)-0.5)*delta/2.0
+        posicion(j,2)= posicion(j,2)+(rands(mvseed)-0.5)*delta/2.0
 
 
 ! temp=delta*0.25
