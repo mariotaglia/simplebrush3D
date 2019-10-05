@@ -99,6 +99,7 @@ integer itmax
 integer infile
 integer randominput
 integer verbose
+integer mvseed
 endmodule
 
 module kai
