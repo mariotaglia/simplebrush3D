@@ -6,7 +6,7 @@ use system
 use chainsdat
 implicit none
 real*8 lseg
-parameter (lseg=0.35)
+parameter (lseg=0.8)
 integer i,il,ll
 integer j
 real*8 indax, inday, indaz
@@ -58,7 +58,7 @@ real*8 rn,state1,sitheta,cotheta,dista,lseg
 real*8 siphip,cophip
 character*1 test
 real*8 m(3,3),mm(3,3),tt(3,3),tp(3,3),tm(3,3)
-parameter (lseg=0.35)
+parameter (lseg=0.8)
 real*8 x(3),xend(3,200),xendr(3,200)
 integer nchas
 real*8 rands

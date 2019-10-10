@@ -41,7 +41,7 @@ enddo
 MCsteps = 10
 if(rank.eq.0)print*, 'kais: CORREGIR MCSTEPS'
 
-lseg=0.35
+lseg=0.8
 l = lseg 
 
 do i = 1, MCsteps
